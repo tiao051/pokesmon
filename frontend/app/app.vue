@@ -68,21 +68,28 @@ h1, h2, h3, h4, h5, h6 {
 .header-container {
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .header-container {
+    padding: 1rem 2rem;
+    gap: 2rem;
+  }
 }
 
 .logo {
-  flex: 1;
+  flex: none;
   display: flex;
   justify-content: flex-start;
 }
 
 .logo h1 {
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
   letter-spacing: -0.5px;
   margin: 0;
   color: var(--color-prussian-blue);
@@ -92,15 +99,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Header Search */
 .header-search {
   display: none;
-  flex: 0 1 600px;
-  width: 100%;
-  position: relative;
-  display: flex;
 }
 
 @media (min-width: 768px) {
   .header-search {
     display: flex;
+    flex: 0 1 600px;
+    width: 100%;
+    position: relative;
   }
 }
 
@@ -296,8 +302,15 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center; /* Mặc định cho màn hình desktop (Căn giữa) */
   z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .hero-bg.full-width {
+    /* Đẩy focus của ảnh nền sang bên phải để thấy rõ Pikachu Van Gogh trên điện thoại/Tablet */
+    object-position: 80% center;
+  }
 }
 
 .hero-overlay {
@@ -306,8 +319,15 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   width: 100%;
   height: 100%;
+  /* Gradient mờ dần ngang cho desktop nhưng trên mobile nên xoay dọc để nội dung không che lấp Pikachu */
   background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%);
   z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .hero-overlay {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.2) 100%);
+  }
 }
 
 .hero-content.full-width-content {
@@ -322,12 +342,28 @@ h1, h2, h3, h4, h5, h6 {
   flex: none;
 }
 
+@media (max-width: 768px) {
+  .hero-content.full-width-content {
+    padding: 2rem 1rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 .hero-text-box.overlay-text {
   max-width: 550px;
   background-color: transparent;
   padding: 0;
   border-left: none;
   box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .hero-text-box.overlay-text {
+    max-width: 100%;
+    margin-top: 2rem;
+  }
 }
 
 .gold-text {
@@ -343,7 +379,7 @@ h1, h2, h3, h4, h5, h6 {
 .white-text {
   color: #FFFFFF;
   margin-bottom: 1.25rem;
-  font-size: 5rem;
+  font-size: clamp(2.5rem, 8vw, 5rem);
   line-height: 1;
   letter-spacing: -1px;
 }
@@ -351,11 +387,17 @@ h1, h2, h3, h4, h5, h6 {
 .white-text-muted {
   color: #E0E0E0;
   font-family: var(--font-sans);
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 3vw, 1.1rem);
   font-weight: 300;
   line-height: 1.6;
   margin-bottom: 2.5rem;
   padding-right: 1rem;
+}
+
+@media (max-width: 768px) {
+  .white-text-muted {
+    padding-right: 0;
+  }
 }
 
 .hero-buttons {
@@ -363,6 +405,14 @@ h1, h2, h3, h4, h5, h6 {
   gap: 1.25rem;
   margin-bottom: 3rem;
   flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .hero-buttons {
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
 }
 
 .rounded-pill {
@@ -461,7 +511,7 @@ h1, h2, h3, h4, h5, h6 {
 /* What's New Separator */
 .whats-new-section {
   background-color: var(--color-linen);
-  padding: 5rem 2rem 4rem;
+  padding: clamp(3rem, 6vw, 5rem) 2rem clamp(2rem, 5vw, 4rem);
   text-align: center;
   display: flex;
   justify-content: center;
@@ -470,7 +520,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .whats-new-text {
   font-family: var(--font-serif);
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   color: var(--color-prussian-blue);
   font-style: italic;
   font-weight: 600;
@@ -491,7 +541,7 @@ h1, h2, h3, h4, h5, h6 {
 /* News Banner Auto-Slider Section */
 .news-banner-section {
   background-color: #0b151c; /* Match deep dark gradient tail from hero */
-  padding: 5rem 2rem;
+  padding: clamp(3rem, 6vw, 5rem) 2rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -645,14 +695,15 @@ h1, h2, h3, h4, h5, h6 {
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 3rem 2rem;
+  grid-template-columns: repeat(2, 1fr); /* Hiển thị 2 items trên mobile */
+  gap: 1.5rem 1rem;
   margin-bottom: 5rem;
 }
 
 @media (min-width: 640px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
   }
 }
 
@@ -725,9 +776,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .product-title {
-  font-size: 1.25rem;
+  font-size: clamp(0.95rem, 2.5vw, 1.25rem);
   margin-bottom: 0.5rem;
   transition: color 0.2s;
+  line-height: 1.3;
 }
 
 .product-card:hover .product-title {
@@ -738,7 +790,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-sans);
   color: var(--color-cypress-green);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2vw, 1.1rem);
 }
 
 .load-more-container {

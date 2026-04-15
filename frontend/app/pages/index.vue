@@ -42,7 +42,7 @@ onUnmounted(() => {
   <main>
     <!-- Hero Section -->
     <section class="hero full-width-hero">
-      <img src="/pikachu_vangogh.webp" alt="Starry Pikachu" class="hero-bg full-width" />
+      <img src="/images/pikachu_vangogh.webp" alt="Starry Pikachu" class="hero-bg full-width" />
       <div class="hero-overlay"></div>
       
       <div class="hero-content full-width-content">
