@@ -148,5 +148,5 @@ Every implementation response **must** conclude with this report:
 
 Use the following skills for specialized guidance:
 - `/backend-expert` — Detailed API/service patterns, authentication, testing
-- `/mobile-expert` — React Native component & screen guidelines, state management
+- `/frontend-expert` — Nuxt 4 and Vue 3 frontend architecture, routing, and UI/data patterns
 - `/fitness-logic` — Domain logic & calculation formulas, business rules
