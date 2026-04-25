@@ -1,14 +1,39 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 definePageMeta({
   layout: 'auth'
 })
 
+const route = useRoute()
+const router = useRouter()
+const { signIn } = useAuth()
+
 const isLogin = ref(true)
+
+const form = reactive({
+  email: '',
+  password: '',
+  confirmPassword: '',
+})
 
 const toggleAuthMode = () => {
   isLogin.value = !isLogin.value
+}
+
+const DEMO_EMAIL = 'curator@pokegogh.museum'
+const DEMO_PASSWORD = 'starrynight'
+
+const fillDemo = () => {
+  form.email = DEMO_EMAIL
+  form.password = DEMO_PASSWORD
+  if (!isLogin.value) form.confirmPassword = DEMO_PASSWORD
+}
+
+const handleSubmit = () => {
+  signIn(form.email)
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+  router.push(redirect)
 }
 </script>
 
@@ -37,23 +62,38 @@ const toggleAuthMode = () => {
           <p class="auth-subtitle" v-if="isLogin">Welcome Back, Trainer!</p>
           <p class="auth-subtitle" v-else>Start Your Journey!</p>
           
-          <form class="auth-form" @submit.prevent>
+          <div v-if="isLogin" class="demo-credentials">
+            <span class="demo-eyebrow">— for the curious patron —</span>
+            <div class="demo-rows">
+              <div class="demo-row">
+                <span class="demo-label">Email</span>
+                <span class="demo-value">{{ DEMO_EMAIL }}</span>
+              </div>
+              <div class="demo-row">
+                <span class="demo-label">Password</span>
+                <span class="demo-value">{{ DEMO_PASSWORD }}</span>
+              </div>
+            </div>
+            <button type="button" class="demo-fill-btn" @click="fillDemo">Use demo patron</button>
+          </div>
+
+          <form class="auth-form" @submit.prevent="handleSubmit">
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="pikachu@pallet-town.com" required />
+              <input id="email" v-model="form.email" type="email" placeholder="pikachu@thi-tran-pallet.vn" required />
             </div>
-            
+
             <div class="form-group">
               <div class="label-row">
                 <label for="password">Password</label>
-                <a href="#" class="forgot-pass" v-if="isLogin">Forgot password?</a>
+                <a v-if="isLogin" href="#" class="forgot-pass">Forgot password?</a>
               </div>
-              <input type="password" id="password" placeholder="••••••••" required />
+              <input id="password" v-model="form.password" type="password" placeholder="••••••••" required />
             </div>
 
-            <div class="form-group" v-if="!isLogin">
+            <div v-if="!isLogin" class="form-group">
               <label for="confirm-password">Confirm Password</label>
-              <input type="password" id="confirm-password" placeholder="••••••••" required />
+              <input id="confirm-password" v-model="form.confirmPassword" type="password" placeholder="••••••••" required />
             </div>
 
             <button type="submit" class="auth-submit-btn">
@@ -265,6 +305,77 @@ const toggleAuthMode = () => {
   color: #555;
   margin-bottom: clamp(0.75rem, 3vh, 1.5rem);
   font-size: clamp(0.85rem, 1.8vh, 1rem);
+}
+
+.demo-credentials {
+  position: relative;
+  margin: 0 0 clamp(0.75rem, 2vh, 1.25rem);
+  padding: clamp(0.65rem, 1.6vh, 0.9rem) clamp(0.85rem, 2vw, 1.1rem);
+  background-color: rgba(255, 197, 18, 0.08);
+  border: 1px dashed rgba(0, 49, 83, 0.35);
+  border-radius: 18px 4px 14px 4px / 4px 14px 4px 18px;
+}
+
+.demo-eyebrow {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: #C2821B;
+  font-size: clamp(0.7rem, 1.4vh, 0.78rem);
+  letter-spacing: 1px;
+  margin-bottom: 0.4rem;
+}
+
+.demo-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.55rem;
+}
+
+.demo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 1.4vh, 0.8rem);
+}
+
+.demo-label {
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #777;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.demo-value {
+  color: var(--color-prussian-blue);
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.72rem, 1.4vh, 0.82rem);
+  text-align: right;
+  word-break: break-all;
+}
+
+.demo-fill-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(0.72rem, 1.4vh, 0.78rem);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-cypress-green);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+.demo-fill-btn:hover {
+  color: var(--color-prussian-blue);
 }
 
 .auth-form {
