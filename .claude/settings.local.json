@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /d/pet-project/pokemon ls-files .agents)",
+      "Bash(git -C /d/pet-project/pokemon status --short)",
+      "Bash(git *)"
+    ]
+  }
+}
