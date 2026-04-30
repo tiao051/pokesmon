@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 const isMobileMenuOpen = ref(false)
 const { count } = useCart()
-const { isLoggedIn, signOut } = useAuth()
+const { isLoggedIn, username, signOut } = useAuth()
 
 const toggleMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -42,10 +42,15 @@ const handleSignOut = () => {
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10 10.07 6.5 12 6.5zm0 13c-2.65 0-5-1.28-6.5-3.23.04-2.15 4.33-3.34 6.5-3.34s6.46 1.19 6.5 3.34c-1.5 1.95-3.85 3.23-6.5 3.23z"/></svg>
           <span class="action-text">SIGN IN / REGISTER</span>
         </NuxtLink>
-        <button v-else class="action-link user-action user-action-button" @click="handleSignOut">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10 10.07 6.5 12 6.5zm0 13c-2.65 0-5-1.28-6.5-3.23.04-2.15 4.33-3.34 6.5-3.34s6.46 1.19 6.5 3.34c-1.5 1.95-3.85 3.23-6.5 3.23z"/></svg>
-          <span class="action-text">SIGN OUT</span>
-        </button>
+        <div v-else class="user-menu">
+          <div class="action-link user-action user-menu-trigger" tabindex="0" role="button" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10 10.07 6.5 12 6.5zm0 13c-2.65 0-5-1.28-6.5-3.23.04-2.15 4.33-3.34 6.5-3.34s6.46 1.19 6.5 3.34c-1.5 1.95-3.85 3.23-6.5 3.23z"/></svg>
+            <span v-if="username" class="user-name">{{ username }}</span>
+          </div>
+          <div class="user-dropdown" role="menu">
+            <button type="button" class="user-dropdown-item" @click="handleSignOut">Sign Out</button>
+          </div>
+        </div>
 
         <NuxtLink to="/cart" class="action-link cart-action">
           <span class="cart-icon-wrapper">
@@ -83,7 +88,8 @@ const handleSignOut = () => {
   display: inline-flex;
   text-decoration: none;
   color: inherit;
-  flex: none;
+  flex: 1;
+  justify-content: flex-start;
 }
 
 .cart-icon-wrapper {
@@ -112,7 +118,6 @@ const handleSignOut = () => {
   box-shadow: 0 2px 4px rgba(0, 49, 83, 0.25);
 }
 
-.user-action-button,
 .nav-link-button {
   background: none;
   border: none;
@@ -121,6 +126,76 @@ const handleSignOut = () => {
   color: inherit;
   text-align: left;
   padding: 0;
+}
+
+.user-menu {
+  position: relative;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .user-menu {
+    display: block;
+  }
+}
+
+.user-menu-trigger {
+  cursor: pointer;
+}
+
+.user-name {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-prussian-blue);
+  letter-spacing: 0.2px;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 150px;
+  margin-top: 0.5rem;
+  background-color: var(--color-linen);
+  border: 1.5px solid rgba(0, 49, 83, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 49, 83, 0.12);
+  padding: 0.4rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  z-index: 20;
+}
+
+.user-menu:hover .user-dropdown,
+.user-menu:focus-within .user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
+}
+
+.user-dropdown-item {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-prussian-blue);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.user-dropdown-item:hover {
+  background-color: rgba(0, 49, 83, 0.06);
+  color: var(--color-cypress-green);
 }
 
 .nav-link-button {
@@ -139,7 +214,6 @@ const handleSignOut = () => {
 
 .cart-badge-mobile {
   position: static;
-  margin-left: 0.5rem;
   border: none;
   box-shadow: none;
 }

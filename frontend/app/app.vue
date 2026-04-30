@@ -160,6 +160,14 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 
+@media (min-width: 768px) {
+  .header-actions > .user-menu,
+  .header-actions > .user-action {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .action-link {
   display: none;
   align-items: center;
@@ -272,6 +280,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .mobile-nav .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   text-decoration: none;
   color: var(--color-prussian-blue);
   font-family: var(--font-sans);

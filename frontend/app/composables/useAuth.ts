@@ -1,6 +1,7 @@
 export interface AuthState {
   isLoggedIn: boolean
   email?: string
+  username?: string
 }
 
 const STORAGE_KEY = 'pokegogh-auth'
@@ -33,8 +34,8 @@ export const useAuth = () => {
     )
   }
 
-  const signIn = (email: string) => {
-    state.value = { isLoggedIn: true, email }
+  const signIn = (email: string, username?: string) => {
+    state.value = { isLoggedIn: true, email, username }
   }
 
   const signOut = () => {
@@ -44,6 +45,7 @@ export const useAuth = () => {
   return {
     isLoggedIn: computed(() => state.value.isLoggedIn),
     email: computed(() => state.value.email),
+    username: computed(() => state.value.username),
     signIn,
     signOut,
   }
