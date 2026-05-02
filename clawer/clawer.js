@@ -6,8 +6,6 @@ const { SEARCH_URL, DETAIL_URL, IMAGE_URL } = require('./constants/endpoint');
 const { downloadImageAsBase64, getSearchPayload, getSearchHeaders } = require('./utils/utils');
 
 async function scrapeData() {
-    console.log(`Starting to scrape data...`);
-    
     let from = 0;
     const size = 24;
     let hasNextPage = true;
