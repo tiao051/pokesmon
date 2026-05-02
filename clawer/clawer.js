@@ -114,6 +114,11 @@ async function scrapeData() {
                 console.log(`Processing product ID: ${productId}`);
                 
                 try {
+                    const existingItem = await Item.findOne({ productId: productId });
+                    if (existingItem) {
+                        console.log(`Product ID ${productId} already exists in DB. Skipping...`);
+                        continue;
+                    }
                     const detailUrl = DETAIL_URL.replace('[PRODUCT_ID]', productId);
                     const detailResponse = await axios.get(detailUrl);
                     const detailData = detailResponse.data;
