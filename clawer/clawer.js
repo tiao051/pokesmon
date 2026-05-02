@@ -1,29 +1,9 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const connectDB = require('./utils/connectDB');
 const axios = require('axios');
 const Item = require('./models/Item');
 const { SEARCH_URL, DETAIL_URL, IMAGE_URL } = require('./constants/endpoint');
-
-async function downloadImageAsBase64(url) {
-    if (!url) return null;
-
-    try {
-        const response = await axios({
-            url,
-            method: 'GET',
-            responseType: 'arraybuffer'
-        });
-        
-        const base64 = Buffer.from(response.data, 'binary').toString('base64');
-        const mimeType = response.headers['content-type'] || 'image/jpeg';
-        
-        return `data:${mimeType};base64,${base64}`;
-    } catch (err) {
-        console.error(`Error downloading image ${url}:`, err.message);
-        return null;
-    }
-}
+const { downloadImageAsBase64 } = require('./utils/utils');
 
 async function scrapeData() {
     console.log(`Starting to scrape data...`);
@@ -119,16 +99,13 @@ async function scrapeData() {
                         return;
                     }
 
-                    // Fetch detail
                     const detailUrl = DETAIL_URL.replace('[PRODUCT_ID]', productId);
                     const detailResponse = await axios.get(detailUrl);
                     const detailData = detailResponse.data;
                     
-                    // Fetch image
                     const imageUrl = IMAGE_URL.replace('${PRODUCT_ID}', productId);
                     const imageBase64 = await downloadImageAsBase64(imageUrl);
                     
-                    // Merge data
                     const itemDataToSave = {
                         ...item,
                         ...detailData,
