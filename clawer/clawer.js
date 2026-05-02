@@ -12,10 +12,9 @@ async function downloadImageAsBase64(url) {
         const response = await axios({
             url,
             method: 'GET',
-            responseType: 'arraybuffer' // Fetch as buffer
+            responseType: 'arraybuffer'
         });
         
-        // Convert buffer to Base64
         const base64 = Buffer.from(response.data, 'binary').toString('base64');
         const mimeType = response.headers['content-type'] || 'image/jpeg';
         
@@ -109,7 +108,7 @@ async function scrapeData() {
                 break;
             }
             
-            for (let item of items) {
+            await Promise.all(items.map(async (item) => {
                 const productId = item.productId;
                 console.log(`Processing product ID: ${productId}`);
                 
@@ -117,15 +116,19 @@ async function scrapeData() {
                     const existingItem = await Item.findOne({ productId: productId });
                     if (existingItem) {
                         console.log(`Product ID ${productId} already exists in DB. Skipping...`);
-                        continue;
+                        return;
                     }
+
+                    // Fetch detail
                     const detailUrl = DETAIL_URL.replace('[PRODUCT_ID]', productId);
                     const detailResponse = await axios.get(detailUrl);
                     const detailData = detailResponse.data;
                     
+                    // Fetch image
                     const imageUrl = IMAGE_URL.replace('${PRODUCT_ID}', productId);
                     const imageBase64 = await downloadImageAsBase64(imageUrl);
                     
+                    // Merge data
                     const itemDataToSave = {
                         ...item,
                         ...detailData,
@@ -142,7 +145,7 @@ async function scrapeData() {
                 } catch (err) {
                     console.error(`Failed to process product ID: ${productId}`, err.message);
                 }
-            }
+            }));
             
             from += size;
             
