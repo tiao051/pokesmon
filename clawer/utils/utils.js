@@ -27,7 +27,12 @@ function getSearchPayload(from, size) {
         "from": from,
         "size": size,
         "filters": {
-            "term": {},
+            "term": {
+                "productLineUrlName": [
+                    "pokemon",
+                    "pokemon-japan"
+                ]
+            },
             "range": {},
             "match": {}
         },
