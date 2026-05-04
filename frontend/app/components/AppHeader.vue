@@ -143,6 +143,11 @@ const handleSignOut = () => {
   cursor: pointer;
 }
 
+.user-menu-trigger svg {
+  width: 44px;
+  height: 44px;
+}
+
 .user-name {
   font-family: var(--font-sans);
   font-weight: 500;
