@@ -1,0 +1,404 @@
+[
+	{
+		"productLineId": 1,
+		"productLineName": "Magic: The Gathering",
+		"productLineUrlName": "magic",
+		"isDirect": true
+	},
+	{
+		"productLineId": 2,
+		"productLineName": "YuGiOh",
+		"productLineUrlName": "yugioh",
+		"isDirect": true
+	},
+	{
+		"productLineId": 3,
+		"productLineName": "Pokemon",
+		"productLineUrlName": "pokemon",
+		"isDirect": true
+	},
+	{
+		"productLineId": 6,
+		"productLineName": "D & D Miniatures",
+		"productLineUrlName": "d-and-d-miniatures",
+		"isDirect": false
+	},
+	{
+		"productLineId": 8,
+		"productLineName": "Heroclix",
+		"productLineUrlName": "heroclix",
+		"isDirect": false
+	},
+	{
+		"productLineId": 13,
+		"productLineName": "WoW",
+		"productLineUrlName": "wow",
+		"isDirect": false
+	},
+	{
+		"productLineId": 16,
+		"productLineName": "Cardfight Vanguard",
+		"productLineUrlName": "cardfight-vanguard",
+		"isDirect": false
+	},
+	{
+		"productLineId": 17,
+		"productLineName": "Force of Will",
+		"productLineUrlName": "force-of-will",
+		"isDirect": false
+	},
+	{
+		"productLineId": 18,
+		"productLineName": "Dice Masters",
+		"productLineUrlName": "dice-masters",
+		"isDirect": false
+	},
+	{
+		"productLineId": 19,
+		"productLineName": "Future Card BuddyFight",
+		"productLineUrlName": "future-card-buddyfight",
+		"isDirect": false
+	},
+	{
+		"productLineId": 20,
+		"productLineName": "Weiss Schwarz",
+		"productLineUrlName": "weiss-schwarz",
+		"isDirect": false
+	},
+	{
+		"productLineId": 23,
+		"productLineName": "Dragon Ball Z TCG",
+		"productLineUrlName": "dragon-ball-z-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 24,
+		"productLineName": "Final Fantasy TCG",
+		"productLineUrlName": "final-fantasy-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 25,
+		"productLineName": "UniVersus",
+		"productLineUrlName": "universus",
+		"isDirect": false
+	},
+	{
+		"productLineId": 26,
+		"productLineName": "Star Wars: Destiny",
+		"productLineUrlName": "star-wars-destiny",
+		"isDirect": false
+	},
+	{
+		"productLineId": 27,
+		"productLineName": "Dragon Ball Super: Masters",
+		"productLineUrlName": "dragon-ball-super-ccg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 28,
+		"productLineName": "Dragoborne",
+		"productLineUrlName": "dragoborne",
+		"isDirect": false
+	},
+	{
+		"productLineId": 29,
+		"productLineName": "Funko",
+		"productLineUrlName": "funko",
+		"isDirect": false
+	},
+	{
+		"productLineId": 30,
+		"productLineName": "MetaX TCG",
+		"productLineUrlName": "metax-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 31,
+		"productLineName": "Card Sleeves",
+		"productLineUrlName": "card-sleeves",
+		"isDirect": false
+	},
+	{
+		"productLineId": 32,
+		"productLineName": "Deck Boxes",
+		"productLineUrlName": "deck-boxes",
+		"isDirect": false
+	},
+	{
+		"productLineId": 33,
+		"productLineName": "Card Storage Tins",
+		"productLineUrlName": "card-storage-tins",
+		"isDirect": false
+	},
+	{
+		"productLineId": 34,
+		"productLineName": "Life Counters",
+		"productLineUrlName": "life-counters",
+		"isDirect": false
+	},
+	{
+		"productLineId": 35,
+		"productLineName": "Playmats",
+		"productLineUrlName": "playmats",
+		"isDirect": false
+	},
+	{
+		"productLineId": 36,
+		"productLineName": "Zombie World Order TCG",
+		"productLineUrlName": "zombie-world-order-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 37,
+		"productLineName": "The Caster Chronicles",
+		"productLineUrlName": "the-caster-chronicles",
+		"isDirect": false
+	},
+	{
+		"productLineId": 38,
+		"productLineName": "My Little Pony CCG",
+		"productLineUrlName": "my-little-pony-ccg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 46,
+		"productLineName": "Books",
+		"productLineUrlName": "books",
+		"isDirect": false
+	},
+	{
+		"productLineId": 47,
+		"productLineName": "Exodus TCG",
+		"productLineUrlName": "exodus-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 48,
+		"productLineName": "Lightseekers TCG",
+		"productLineUrlName": "lightseekers-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 49,
+		"productLineName": "Protective Pages",
+		"productLineUrlName": "protective-pages",
+		"isDirect": false
+	},
+	{
+		"productLineId": 50,
+		"productLineName": "Storage Albums",
+		"productLineUrlName": "storage-albums",
+		"isDirect": false
+	},
+	{
+		"productLineId": 51,
+		"productLineName": "Collectible Storage",
+		"productLineUrlName": "collectible-storage",
+		"isDirect": false
+	},
+	{
+		"productLineId": 52,
+		"productLineName": "Supply Bundles",
+		"productLineUrlName": "supply-bundles",
+		"isDirect": false
+	},
+	{
+		"productLineId": 53,
+		"productLineName": "Munchkin CCG",
+		"productLineUrlName": "munchkin-ccg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 54,
+		"productLineName": "Warhammer Age of Sigmar Champions TCG",
+		"productLineUrlName": "warhammer-age-of-sigmar-champions-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 56,
+		"productLineName": "Bulk Lots",
+		"productLineUrlName": "bulk-lots",
+		"isDirect": false
+	},
+	{
+		"productLineId": 57,
+		"productLineName": "Transformers TCG",
+		"productLineUrlName": "transformers-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 58,
+		"productLineName": "Bakugan TCG",
+		"productLineUrlName": "bakugan-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 59,
+		"productLineName": "KeyForge",
+		"productLineUrlName": "keyforge",
+		"isDirect": false
+	},
+	{
+		"productLineId": 60,
+		"productLineName": "Chrono Clash System",
+		"productLineUrlName": "chrono-clash-system",
+		"isDirect": false
+	},
+	{
+		"productLineId": 61,
+		"productLineName": "Argent Saga TCG",
+		"productLineUrlName": "argent-saga-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 62,
+		"productLineName": "Flesh and Blood TCG",
+		"productLineUrlName": "flesh-and-blood-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 63,
+		"productLineName": "Digimon Card Game",
+		"productLineUrlName": "digimon-card-game",
+		"isDirect": false
+	},
+	{
+		"productLineId": 64,
+		"productLineName": "Alternate Souls",
+		"productLineUrlName": "alternate-souls",
+		"isDirect": false
+	},
+	{
+		"productLineId": 65,
+		"productLineName": "Gate Ruler",
+		"productLineUrlName": "gate-ruler",
+		"isDirect": false
+	},
+	{
+		"productLineId": 66,
+		"productLineName": "MetaZoo",
+		"productLineUrlName": "metazoo",
+		"isDirect": false
+	},
+	{
+		"productLineId": 67,
+		"productLineName": "WIXOSS",
+		"productLineUrlName": "wixoss",
+		"isDirect": false
+	},
+	{
+		"productLineId": 68,
+		"productLineName": "One Piece Card Game",
+		"productLineUrlName": "one-piece-card-game",
+		"isDirect": false
+	},
+	{
+		"productLineId": 71,
+		"productLineName": "Disney Lorcana",
+		"productLineUrlName": "lorcana-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 72,
+		"productLineName": "Battle Spirits Saga",
+		"productLineUrlName": "battle-spirits-saga",
+		"isDirect": false
+	},
+	{
+		"productLineId": 73,
+		"productLineName": "Shadowverse: Evolve",
+		"productLineUrlName": "shadowverse-evolve",
+		"isDirect": false
+	},
+	{
+		"productLineId": 74,
+		"productLineName": "Grand Archive TCG",
+		"productLineUrlName": "grand-archive",
+		"isDirect": false
+	},
+	{
+		"productLineId": 75,
+		"productLineName": "Akora TCG",
+		"productLineUrlName": "akora",
+		"isDirect": false
+	},
+	{
+		"productLineId": 76,
+		"productLineName": "Kryptik TCG",
+		"productLineUrlName": "kryptik-tcg",
+		"isDirect": false
+	},
+	{
+		"productLineId": 77,
+		"productLineName": "Sorcery: Contested Realm",
+		"productLineUrlName": "sorcery-contested-realm",
+		"isDirect": false
+	},
+	{
+		"productLineId": 78,
+		"productLineName": "Alpha Clash",
+		"productLineUrlName": "alpha-clash",
+		"isDirect": false
+	},
+	{
+		"productLineId": 79,
+		"productLineName": "Star Wars: Unlimited",
+		"productLineUrlName": "star-wars-unlimited",
+		"isDirect": false
+	},
+	{
+		"productLineId": 80,
+		"productLineName": "Dragon Ball Super: Fusion World",
+		"productLineUrlName": "dragon-ball-super-fusion-world",
+		"isDirect": false
+	},
+	{
+		"productLineId": 81,
+		"productLineName": "Union Arena",
+		"productLineUrlName": "union-arena",
+		"isDirect": false
+	},
+	{
+		"productLineId": 82,
+		"productLineName": "TCGplayer Supplies",
+		"productLineUrlName": "tcgplayer-supplies",
+		"isDirect": false
+	},
+	{
+		"productLineId": 83,
+		"productLineName": "Elestrals",
+		"productLineUrlName": "elestrals",
+		"isDirect": false
+	},
+	{
+		"productLineId": 85,
+		"productLineName": "Pokemon Japan",
+		"productLineUrlName": "pokemon-japan",
+		"isDirect": false
+	},
+	{
+		"productLineId": 86,
+		"productLineName": "Gundam Card Game",
+		"productLineUrlName": "gundam-card-game",
+		"isDirect": false
+	},
+	{
+		"productLineId": 87,
+		"productLineName": "hololive OFFICIAL CARD GAME",
+		"productLineUrlName": "hololive-official-card-game",
+		"isDirect": false
+	},
+	{
+		"productLineId": 88,
+		"productLineName": "Godzilla Card Game",
+		"productLineUrlName": "godzilla-card-game",
+		"isDirect": false
+	},
+	{
+		"productLineId": 89,
+		"productLineName": "Riftbound: League of Legends Trading Card Game",
+		"productLineUrlName": "riftbound-league-of-legends-trading-card-game",
+		"isDirect": false
+	}
+]
