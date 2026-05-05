@@ -13,6 +13,27 @@ const { history, addSearchTerm } = useSearchHistory()
 
 const searchQuery = ref('')
 const isSearchFocused = ref(false)
+const isInputFocused = ref(false)
+
+const onSearchFocusIn = () => {
+  isInputFocused.value = true
+  isSearchFocused.value = true
+}
+
+const onSearchFocusOut = () => {
+  setTimeout(() => {
+    isInputFocused.value = false
+    isSearchFocused.value = false
+  }, 200)
+}
+
+const onSearchMouseEnter = () => {
+  if (isInputFocused.value) isSearchFocused.value = true
+}
+
+const onSearchMouseLeave = () => {
+  isSearchFocused.value = false
+}
 
 const toggleMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -56,7 +77,13 @@ const suggestions = computed(() => {
       </NuxtLink>
 
       <!-- Middle Search Bar -->
-      <div class="header-search" @focusin="isSearchFocused = true" @focusout="setTimeout(() => isSearchFocused = false, 200)">
+      <div
+        class="header-search"
+        @focusin="onSearchFocusIn"
+        @focusout="onSearchFocusOut"
+        @mouseenter="onSearchMouseEnter"
+        @mouseleave="onSearchMouseLeave"
+      >
         <input type="text" v-model="searchQuery" @keyup.enter="executeSearch()" placeholder="Search Pikachu, Plush, T-Shirts..." class="search-input" />
         <button class="search-btn" aria-label="Search" @click="executeSearch()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
