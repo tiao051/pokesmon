@@ -6,15 +6,19 @@ import { products, categories } from '~/data/products'
 const route = useRoute()
 const query = computed(() => route.query.q?.toString() || '')
 
-const selectedCategories = ref([])
+const selectedCategory = ref('')
 const maxPrice = ref(300)
 
 const currentPage = ref(1)
 const itemsPerPage = 8
 
-watch([query, selectedCategories, maxPrice], () => {
+watch([query, selectedCategory, maxPrice], () => {
   currentPage.value = 1
 })
+
+const toggleCategory = (cat) => {
+  selectedCategory.value = selectedCategory.value === cat ? '' : cat
+}
 
 const filteredProducts = computed(() => {
   let result = products
@@ -25,8 +29,8 @@ const filteredProducts = computed(() => {
   }
 
   // Filter by category
-  if (selectedCategories.value.length > 0) {
-    result = result.filter(p => selectedCategories.value.includes(p.category))
+  if (selectedCategory.value) {
+    result = result.filter(p => p.category === selectedCategory.value)
   }
 
   // Filter by price
@@ -64,7 +68,12 @@ const paginatedProducts = computed(() => {
             <h3>Categories</h3>
             <div class="checkbox-list">
               <label v-for="cat in categories" :key="cat" class="checkbox-label">
-                <input type="checkbox" :value="cat" v-model="selectedCategories" class="custom-checkbox" />
+                <input
+                  type="checkbox"
+                  :checked="selectedCategory === cat"
+                  class="custom-checkbox"
+                  @change="toggleCategory(cat)"
+                />
                 <span class="checkbox-text">{{ cat }}</span>
               </label>
             </div>
@@ -273,7 +282,15 @@ const paginatedProducts = computed(() => {
 }
 
 .empty-state-wrapper {
-  padding: 4rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: clamp(280px, 40vh, 460px);
+}
+
+.empty-state-wrapper :deep(.empty-state) {
+  margin: 0 auto;
+  width: 100%;
 }
 
 .pagination {
