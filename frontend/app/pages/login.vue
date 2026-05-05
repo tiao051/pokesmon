@@ -126,8 +126,11 @@
 						<div class="form-group">
 							<div class="label-row">
 								<label for="password">Password</label>
-								<a v-if="isLogin" href="#" class="forgot-pass"
-									>Forgot password?</a
+								<NuxtLink
+									v-if="isLogin"
+									to="/forgot-password"
+									class="forgot-pass"
+									>Forgot password?</NuxtLink
 								>
 							</div>
 							<input

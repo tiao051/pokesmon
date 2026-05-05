@@ -105,6 +105,7 @@ const suggestions = computed(() => {
             <span v-if="username" class="user-name">{{ username }}</span>
           </div>
           <div class="user-dropdown" role="menu">
+            <NuxtLink to="/account" class="user-dropdown-item" role="menuitem">My Profile</NuxtLink>
             <button type="button" class="user-dropdown-item" @click="handleSignOut">Sign Out</button>
           </div>
         </div>
@@ -123,6 +124,11 @@ const suggestions = computed(() => {
         <button class="search-btn" @click="executeSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
       </div>
       <NuxtLink to="/products" class="nav-link" @click="closeMenu">Browse The Collection</NuxtLink>
+      <NuxtLink v-if="!isLoggedIn" to="/login" class="nav-link" @click="closeMenu">Sign In / Register</NuxtLink>
+      <template v-else>
+        <NuxtLink to="/account" class="nav-link" @click="closeMenu">My Profile</NuxtLink>
+        <button class="nav-link nav-link-button" @click="handleSignOut">Sign Out</button>
+      </template>
       <NuxtLink to="/cart" class="nav-link" @click="closeMenu">
         My Cart <span v-if="count > 0" class="cart-badge cart-badge-mobile">{{ count }}</span>
       </NuxtLink>
@@ -242,6 +248,7 @@ const suggestions = computed(() => {
   font-weight: 500;
   color: var(--color-prussian-blue);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.15s ease, color 0.15s ease;
