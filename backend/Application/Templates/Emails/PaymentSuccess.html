@@ -1,0 +1,16 @@
+<h2 style='color: #003153; font-family: "Playfair Display", serif; margin-top: 0;'>Payment Received</h2>
+<p>Hello {{username}},</p>
+<p>We've successfully processed your payment. Thank you for your purchase!</p>
+<div style='background-color: #F3F1E9; border: 1px solid #E0E0E0; border-radius: 8px; padding: 20px; margin: 20px 0;'>
+    <table style='width: 100%;'>
+        <tr>
+            <td style='padding-bottom: 10px; color: #1A1A1A;'><strong>Order ID:</strong></td>
+            <td style='padding-bottom: 10px; text-align: right; color: #003153;'>#{{orderId}}</td>
+        </tr>
+        <tr>
+            <td style='border-top: 1px solid #ccc; padding-top: 10px; color: #1A1A1A;'><strong>Total Paid:</strong></td>
+            <td style='border-top: 1px solid #ccc; padding-top: 10px; text-align: right; color: #0F5E3C; font-weight: bold; font-size: 18px;'>${{amount}}</td>
+        </tr>
+    </table>
+</div>
+<p>Your order is now being prepared for dispatch. You will receive another email once it's on its way.</p>
