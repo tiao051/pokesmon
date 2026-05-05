@@ -6,7 +6,7 @@
           <h2 class="footer-logo">PokéGogh</h2>
           <p class="footer-desc">A post-impressionist journey through the Pokémon universe, capturing the electric essence of the classics.</p>
         </div>
-        
+
         <div class="footer-links">
           <h4 class="footer-heading">Collection</h4>
           <nav>
@@ -16,7 +16,7 @@
             <a href="#">Exclusive Prints</a>
           </nav>
         </div>
-        
+
         <div class="footer-links">
           <h4 class="footer-heading">Museum</h4>
           <nav>
@@ -38,7 +38,7 @@
           </form>
         </div>
       </div>
-      
+
       <div class="footer-bottom">
         <p>© 2026 PokéGogh Museum Collection | Inspired by Vincent van Gogh</p>
         <div class="footer-legal">
