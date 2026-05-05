@@ -48,6 +48,7 @@ const handleSignOut = () => {
             <span v-if="username" class="user-name">{{ username }}</span>
           </div>
           <div class="user-dropdown" role="menu">
+            <NuxtLink to="/account" class="user-dropdown-item" role="menuitem">My Profile</NuxtLink>
             <button type="button" class="user-dropdown-item" @click="handleSignOut">Sign Out</button>
           </div>
         </div>
@@ -75,7 +76,10 @@ const handleSignOut = () => {
       </div>
       <NuxtLink to="/products" class="nav-link" @click="closeMenu">Browse The Collection</NuxtLink>
       <NuxtLink v-if="!isLoggedIn" to="/login" class="nav-link" @click="closeMenu">Sign In / Register</NuxtLink>
-      <button v-else class="nav-link nav-link-button" @click="handleSignOut">Sign Out</button>
+      <template v-else>
+        <NuxtLink to="/account" class="nav-link" @click="closeMenu">My Profile</NuxtLink>
+        <button class="nav-link nav-link-button" @click="handleSignOut">Sign Out</button>
+      </template>
       <NuxtLink to="/cart" class="nav-link" @click="closeMenu">
         My Cart <span v-if="count > 0" class="cart-badge cart-badge-mobile">{{ count }}</span>
       </NuxtLink>
@@ -193,6 +197,7 @@ const handleSignOut = () => {
   font-weight: 500;
   color: var(--color-prussian-blue);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.15s ease, color 0.15s ease;

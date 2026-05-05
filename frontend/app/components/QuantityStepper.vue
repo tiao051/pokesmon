@@ -87,4 +87,19 @@ const increment = () => {
   text-align: center;
   user-select: none;
 }
+
+@media (max-width: 480px) {
+  .qty-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .qty-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  .qty-value {
+    font-size: 0.9rem;
+    min-width: 28px;
+  }
+}
 </style>
