@@ -1,163 +1,142 @@
-// frontend/app/services/authService.js
-// Uses Nuxt's built-in $fetch or native fetch
+import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:5246/api'; // Change to match your .NET backend port
+const getApiBaseUrl = () => {
+	try {
+		const config = useRuntimeConfig();
+		return config.public.apiBaseUrl || "http://localhost:5246/api";
+	} catch {
+		return "http://localhost:5246/api";
+	}
+};
+
+const api = axios.create({
+	baseURL: getApiBaseUrl(),
+	headers: {
+		"Content-Type": "application/json",
+	},
+});
+
+api.interceptors.request.use(
+	(config) => {
+		if (typeof window !== "undefined") {
+			const token = localStorage.getItem("auth_token");
+			if (token) {
+				config.headers.Authorization = `Bearer ${token}`;
+			}
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	},
+);
 
 export const authService = {
-  /**
-   * Register a new user
-   * @param {Object} userData - { email, username, password }
-   * @returns {Promise<Object>} - { user, token }
-   */
-  async register(userData) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+	/**
+	 * Đăng ký tài khoản mới
+	 * @param {Object} userData - { email, username, password }
+	 */
+	async register(userData) {
+		try {
+			const response = await api.post("/auth/register", userData);
+			return response.data;
+		} catch (error) {
+			this._handleError(error, "Đăng ký thất bại");
+		}
+	},
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Registration failed');
-      }
+	/**
+	 * Xác thực Email bằng mã PIN
+	 * @param {Object} data - { email, pin }
+	 */
+	async verifyEmail(data) {
+		try {
+			const response = await api.post("/auth/verify-email", data);
+			const responseData = response.data;
 
-      return await response.json();
-    } catch (error) {
-      console.error('AuthService register error:', error);
-      throw error;
-    }
-  },
+			if (typeof window !== "undefined" && responseData.token) {
+				localStorage.setItem("auth_token", responseData.token);
+			}
 
-  /**
-   * Login a user
-   * @param {Object} credentials - { email, password }
-   * @returns {Promise<Object>} - { user, token }
-   */
-  async login(credentials) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+			return responseData;
+		} catch (error) {
+			this._handleError(error, "Xác thực mã PIN thất bại");
+		}
+	},
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Login failed');
-      }
+	/**
+	 * Đăng nhập
+	 * @param {Object} credentials - { email, password }
+	 */
+	async login(credentials) {
+		try {
+			const response = await api.post("/auth/login", credentials);
+			const data = response.data;
 
-      const data = await response.json();
-      
-      // Store token in localStorage (or preferably an HttpOnly cookie via a server route)
-      if (typeof window !== 'undefined' && data.token) {
-        localStorage.setItem('auth_token', data.token);
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('AuthService login error:', error);
-      throw error;
-    }
-  },
+			if (typeof window !== "undefined" && data.token) {
+				localStorage.setItem("auth_token", data.token);
+			}
 
-  /**
-   * Verify email with PIN
-   * @param {Object} data - { email, pin }
-   * @returns {Promise<Object>} - { user, token }
-   */
-  async verifyEmail(data) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+			return data;
+		} catch (error) {
+			this._handleError(error, "Đăng nhập thất bại");
+		}
+	},
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Verification failed');
-      }
+	/**
+	 * Yêu cầu mã PIN quên mật khẩu
+	 * @param {Object} data - { email }
+	 */
+	async requestPasswordReset(data) {
+		try {
+			const response = await api.post(
+				"/auth/request-password-reset",
+				data,
+			);
+			return response.data;
+		} catch (error) {
+			this._handleError(error, "Yêu cầu đặt lại mật khẩu thất bại");
+		}
+	},
 
-      const responseData = await response.json();
-      if (typeof window !== 'undefined' && responseData.token) {
-        localStorage.setItem('auth_token', responseData.token);
-      }
-      return responseData;
-    } catch (error) {
-      console.error('AuthService verifyEmail error:', error);
-      throw error;
-    }
-  },
+	/**
+	 * Đặt lại mật khẩu bằng mã PIN
+	 * @param {Object} data - { email, pin, newPassword }
+	 */
+	async resetPassword(data) {
+		try {
+			const response = await api.post("/auth/reset-password", data);
+			return response.data;
+		} catch (error) {
+			this._handleError(error, "Đặt lại mật khẩu thất bại");
+		}
+	},
 
-  /**
-   * Request password reset PIN
-   * @param {Object} data - { email }
-   */
-  async requestPasswordReset(data) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/request-password-reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+	/**
+	 * Đăng xuất
+	 */
+	logout() {
+		if (typeof window !== "undefined") {
+			localStorage.removeItem("auth_token");
+		}
+	},
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Request failed');
-      }
+	/**
+	 * Lấy Token hiện tại
+	 */
+	getToken() {
+		if (typeof window !== "undefined") {
+			return localStorage.getItem("auth_token");
+		}
+		return null;
+	},
 
-      return await response.json();
-    } catch (error) {
-      console.error('AuthService requestPasswordReset error:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Reset password with PIN
-   * @param {Object} data - { email, pin, newPassword }
-   */
-  async resetPassword(data) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Password reset failed');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('AuthService resetPassword error:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Logout user
-   */
-  logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-    }
-  },
-
-  /**
-   * Get auth token
-   */
-  getToken() {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
-    }
-    return null;
-  }
+	/**
+	 * Hàm xử lý lỗi tập trung
+	 */
+	_handleError(error, defaultMessage) {
+		const message = error.response?.data || error.message || defaultMessage;
+		console.error(`AuthService Error: ${message}`, error);
+		throw new Error(message);
+	},
 };
