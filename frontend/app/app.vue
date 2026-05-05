@@ -526,6 +526,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: clamp(3rem, 6vw, 5rem) 2rem clamp(2rem, 5vw, 4rem);
   text-align: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
