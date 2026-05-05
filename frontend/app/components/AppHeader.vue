@@ -1,9 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { products } from '~/data/products'
+import { useSearchHistory } from '~/composables/useSearchHistory'
+import { fuzzySearch } from '~/utils/search'
 
+const router = useRouter()
 const isMobileMenuOpen = ref(false)
 const { count } = useCart()
 const { isLoggedIn, username, signOut } = useAuth()
+const { history, addSearchTerm } = useSearchHistory()
+
+const searchQuery = ref('')
+const isSearchFocused = ref(false)
 
 const toggleMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -17,6 +26,24 @@ const handleSignOut = () => {
   signOut()
   closeMenu()
 }
+
+const executeSearch = (term) => {
+  const query = (typeof term === 'string' ? term : searchQuery.value || '').trim()
+  if (!query) return
+  addSearchTerm(query)
+  searchQuery.value = query
+  isSearchFocused.value = false
+  closeMenu()
+  router.push({ path: '/search', query: { q: query } })
+}
+
+const suggestions = computed(() => {
+  const query = searchQuery.value.trim()
+  if (!query) return []
+  return products
+    .filter(p => fuzzySearch(query, p.title) || fuzzySearch(query, p.description))
+    .slice(0, 5)
+})
 </script>
 
 <template>
@@ -29,11 +56,33 @@ const handleSignOut = () => {
       </NuxtLink>
 
       <!-- Middle Search Bar -->
-      <div class="header-search">
-        <input type="text" placeholder="Search Pikachu, Plush, T-Shirts..." class="search-input" />
-        <button class="search-btn" aria-label="Search">
+      <div class="header-search" @focusin="isSearchFocused = true" @focusout="setTimeout(() => isSearchFocused = false, 200)">
+        <input type="text" v-model="searchQuery" @keyup.enter="executeSearch()" placeholder="Search Pikachu, Plush, T-Shirts..." class="search-input" />
+        <button class="search-btn" aria-label="Search" @click="executeSearch()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
+        <div v-if="isSearchFocused && (history.length > 0 || searchQuery.trim())" class="search-dropdown">
+          <div v-if="!searchQuery.trim() && history.length > 0" class="search-history">
+            <div class="search-dropdown-header">Recent Searches</div>
+            <div v-for="item in history" :key="item" class="search-dropdown-item" @click="executeSearch(item)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="history-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              {{ item }}
+            </div>
+          </div>
+          <div v-else-if="searchQuery.trim() && suggestions.length > 0" class="search-suggestions">
+            <div class="search-dropdown-header">Products</div>
+            <NuxtLink v-for="prod in suggestions" :key="prod.id" :to="`/products/${prod.slug}`" class="search-dropdown-item product-suggestion" @click="isSearchFocused = false">
+              <img :src="prod.image" :alt="prod.title" class="suggestion-img"/>
+              <div class="suggestion-info">
+                <div class="suggestion-title">{{ prod.title }}</div>
+                <div class="suggestion-price">${{ prod.price.toFixed(2) }}</div>
+              </div>
+            </NuxtLink>
+          </div>
+          <div v-else-if="searchQuery.trim() && suggestions.length === 0" class="search-dropdown-item no-results">
+            No results found for "{{ searchQuery }}"
+          </div>
+        </div>
       </div>
 
       <!-- Right Actions -->
@@ -70,8 +119,8 @@ const handleSignOut = () => {
     <!-- Mobile Nav -->
     <nav class="mobile-nav" :class="{ 'open': isMobileMenuOpen }">
       <div class="mobile-search">
-        <input type="text" placeholder="Search Pikachu..." class="search-input" />
-        <button class="search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+        <input type="text" v-model="searchQuery" @keyup.enter="executeSearch()" placeholder="Search Pikachu..." class="search-input" />
+        <button class="search-btn" @click="executeSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
       </div>
       <NuxtLink to="/products" class="nav-link" @click="closeMenu">Browse The Collection</NuxtLink>
       <NuxtLink v-if="!isLoggedIn" to="/login" class="nav-link" @click="closeMenu">Sign In / Register</NuxtLink>
@@ -221,5 +270,86 @@ const handleSignOut = () => {
   position: static;
   border: none;
   box-shadow: none;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid rgba(0,49,83,0.1);
+  border-top: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.search-dropdown-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #888;
+  background: #f9f9f9;
+  font-family: var(--font-sans);
+}
+
+.search-dropdown-item {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--color-prussian-blue);
+  font-family: var(--font-sans);
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.search-dropdown-item:hover {
+  background-color: rgba(0,49,83,0.05);
+}
+
+.search-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.history-icon {
+  width: 16px;
+  height: 16px;
+  color: #888;
+}
+
+.suggestion-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.suggestion-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.suggestion-price {
+  font-size: 0.8rem;
+  color: var(--color-cypress-green);
+}
+
+.no-results {
+  color: #888;
+  cursor: default;
+  justify-content: center;
+}
+.no-results:hover {
+  background-color: white;
 }
 </style>
