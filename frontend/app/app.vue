@@ -575,7 +575,7 @@ h1, h2, h3, h4, h5, h6 {
 .news-banner-container {
   max-width: 900px;
   margin: 0 auto;
-  min-height: 200px;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
   justify-content: center;
