@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { formatPrice } from '~/data/products'
+import { formatPrice } from '../types/product'
 
 const props = defineProps({
   item: { type: Object, required: true }
@@ -21,13 +21,40 @@ const confirmRemove = () => {
   remove(props.item.product.id)
 }
 
+const isThumbLoaded = ref(false)
+const onThumbLoad = () => {
+  isThumbLoaded.value = true
+}
+
+const thumbSrc = computed(() => {
+  const p = props.item.product
+  if (p.imageBase64) {
+    const base64 = p.imageBase64
+    if (base64.startsWith('data:')) return base64
+    return `data:image/png;base64,${base64}`
+  }
+  return p.image || '/images/loading_gif.gif'
+})
+
 const lineTotal = computed(() => formatPrice(props.item.product.price * props.item.quantity))
 </script>
 
 <template>
   <div class="cart-line">
     <NuxtLink :to="`/products/${item.product.slug}`" class="cart-thumb">
-      <img :src="item.product.image" :alt="item.product.title" />
+      <!-- Main Thumb -->
+      <img 
+        :src="thumbSrc" 
+        :alt="item.product.title" 
+        :class="{ 'is-hidden': !isThumbLoaded }"
+        @load="onThumbLoad"
+        @error="onThumbLoad"
+      />
+      
+      <!-- Loading Overlay -->
+      <div v-if="!isThumbLoaded" class="thumb-loading-overlay">
+        <img src="/images/loading_gif.gif" alt="Loading..." class="loading-gif" />
+      </div>
     </NuxtLink>
 
     <div class="cart-line-info">
@@ -90,24 +117,48 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
   .cart-thumb { grid-area: thumb; }
   .cart-line-info { grid-area: info; }
   .cart-line-qty { grid-area: qty; align-self: end; }
-  .cart-line-total { grid-area: total; align-self: end; }
-  .cart-line-remove { grid-area: remove; align-self: start; justify-self: end; }
 }
 
 .cart-thumb {
-  display: block;
-  aspect-ratio: 4/5;
-  width: 100%;
-  background-color: #E8E5D8;
-  border-radius: 6px;
+  width: 100px;
+  height: 125px;
+  background-color: var(--color-linen);
+  border: 1px solid var(--color-prussian-blue);
+  border-radius: 12px 4px 10px 4px / 4px 10px 4px 12px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .cart-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.cart-thumb img.is-hidden {
+  opacity: 0;
+  position: absolute;
+}
+
+.thumb-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-linen);
+  z-index: 1;
+}
+
+.thumb-loading-overlay .loading-gif {
+  width: 40%;
+  height: auto;
 }
 
 .cart-line-info {

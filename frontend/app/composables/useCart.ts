@@ -1,4 +1,4 @@
-import type { Product } from '~/data/products'
+import type { Product } from '../types/product'
 
 export interface CartItem {
   product: Product
@@ -11,7 +11,7 @@ let hydrated = false
 export const useCart = () => {
   const items = useState<CartItem[]>('cart', () => [])
 
-  if (import.meta.client && !hydrated) {
+  if (process.client && !hydrated) {
     hydrated = true
     try {
       const raw = localStorage.getItem(STORAGE_KEY)

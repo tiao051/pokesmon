@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace backend.Core.Entities;
 
+[BsonIgnoreExtraElements]
 public class Product
 {
     [BsonId]
@@ -26,6 +27,21 @@ public class Product
 
     [BsonElement("productLineUrlName")]
     public string ProductLineUrlName { get; set; } = string.Empty;
+
+    [BsonElement("productTypeName")]
+    public string ProductTypeName { get; set; } = string.Empty;
+
+    [BsonElement("productTypeId")]
+    public int ProductTypeId { get; set; }
+
+    [BsonElement("rarityName")]
+    public string RarityName { get; set; } = string.Empty;
+
+    [BsonElement("sealed")]
+    public bool Sealed { get; set; }
+
+    [BsonElement("listings")]
+    public int Listings { get; set; }
 
     [BsonElement("marketPrice")]
     public decimal? MarketPrice { get; set; }

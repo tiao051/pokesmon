@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 	import {ref, reactive} from "vue";
 
 	definePageMeta({
@@ -10,6 +10,8 @@
 	const {signIn} = useAuth();
 
 	const isLogin = ref(true);
+	const submitting = ref(false);
+	const errorMessage = ref("");
 
 	const form = reactive({
 		email: "",
@@ -21,22 +23,26 @@
 		isLogin.value = !isLogin.value;
 	};
 
-	const DEMO_EMAIL = "curator@pokegogh.museum";
-	const DEMO_PASSWORD = "starrynight";
-
-	const fillDemo = () => {
-		form.email = DEMO_EMAIL;
-		form.password = DEMO_PASSWORD;
-		if (!isLogin.value) form.confirmPassword = DEMO_PASSWORD;
-	};
-
-	const handleSubmit = () => {
-		signIn(form.email);
-		const redirect =
-			typeof route.query.redirect === "string" ?
-				route.query.redirect
-			:	"/";
-		router.push(redirect);
+	const handleSubmit = async () => {
+		errorMessage.value = "";
+		if (!form.email || !form.password) {
+			errorMessage.value = "Please fill in all fields.";
+			return;
+		}
+		submitting.value = true;
+		try {
+			await signIn(form.email, form.password);
+			const redirect =
+				typeof route.query.redirect === "string" ?
+					route.query.redirect
+				:	"/";
+			router.push(redirect);
+		} catch (err: any) {
+			errorMessage.value =
+				err?.message || "Login failed. Please try again.";
+		} finally {
+			submitting.value = false;
+		}
 	};
 </script>
 
@@ -86,29 +92,8 @@
 					</p>
 					<p class="auth-subtitle" v-else>Start Your Journey!</p>
 
-					<div v-if="isLogin" class="demo-credentials">
-						<span class="demo-eyebrow"
-							>— for the curious patron —</span
-						>
-						<div class="demo-rows">
-							<div class="demo-row">
-								<span class="demo-label">Email</span>
-								<span class="demo-value">{{ DEMO_EMAIL }}</span>
-							</div>
-							<div class="demo-row">
-								<span class="demo-label">Password</span>
-								<span class="demo-value">{{
-									DEMO_PASSWORD
-								}}</span>
-							</div>
-						</div>
-						<button
-							type="button"
-							class="demo-fill-btn"
-							@click="fillDemo"
-						>
-							Use demo patron
-						</button>
+					<div v-if="errorMessage" class="auth-error">
+						{{ errorMessage }}
 					</div>
 
 					<form class="auth-form" @submit.prevent="handleSubmit">
@@ -155,8 +140,15 @@
 							/>
 						</div>
 
-						<button type="submit" class="auth-submit-btn">
-							{{ isLogin ? "Sign In" : "Create Account" }}
+						<button
+							type="submit"
+							class="auth-submit-btn"
+							:disabled="submitting"
+						>
+							<span v-if="submitting">Signing in...</span>
+							<span v-else>{{
+								isLogin ? "Sign In" : "Create Account"
+							}}</span>
 						</button>
 					</form>
 
@@ -407,75 +399,16 @@
 		font-size: clamp(0.85rem, 1.8vh, 1rem);
 	}
 
-	.demo-credentials {
-		position: relative;
-		margin: 0 0 clamp(0.75rem, 2vh, 1.25rem);
-		padding: clamp(0.65rem, 1.6vh, 0.9rem) clamp(0.85rem, 2vw, 1.1rem);
-		background-color: rgba(255, 197, 18, 0.08);
-		border: 1px dashed rgba(0, 49, 83, 0.35);
-		border-radius: 18px 4px 14px 4px / 4px 14px 4px 18px;
-	}
-
-	.demo-eyebrow {
-		display: block;
-		font-family: var(--font-serif);
-		font-style: italic;
-		color: #c2821b;
-		font-size: clamp(0.7rem, 1.4vh, 0.78rem);
-		letter-spacing: 1px;
-		margin-bottom: 0.4rem;
-	}
-
-	.demo-rows {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-		margin-bottom: 0.55rem;
-	}
-
-	.demo-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		gap: 0.75rem;
+	.auth-error {
+		background: rgba(220, 53, 69, 0.1);
+		border: 1px solid rgba(220, 53, 69, 0.3);
+		border-radius: 8px;
+		color: #b02a37;
 		font-family: var(--font-sans);
-		font-size: clamp(0.72rem, 1.4vh, 0.8rem);
-	}
-
-	.demo-label {
-		text-transform: uppercase;
-		letter-spacing: 0.8px;
-		color: #777;
-		font-size: 0.7rem;
-		flex-shrink: 0;
-	}
-
-	.demo-value {
-		color: var(--color-prussian-blue);
-		font-weight: 600;
-		font-family: "Courier New", monospace;
-		font-size: clamp(0.72rem, 1.4vh, 0.82rem);
-		text-align: right;
-		word-break: break-all;
-	}
-
-	.demo-fill-btn {
-		background: none;
-		border: none;
-		padding: 0;
-		font-family: var(--font-sans);
-		font-weight: 700;
-		font-size: clamp(0.72rem, 1.4vh, 0.78rem);
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		color: var(--color-cypress-green);
-		cursor: pointer;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		transition: color 0.2s ease;
-	}
-	.demo-fill-btn:hover {
-		color: var(--color-prussian-blue);
+		font-size: clamp(0.8rem, 1.5vh, 0.9rem);
+		padding: 0.65rem 1rem;
+		margin-bottom: clamp(0.5rem, 2vh, 1rem);
+		text-align: center;
 	}
 
 	.auth-form {
@@ -571,6 +504,13 @@
 	.auth-submit-btn:active {
 		transform: translate(2px, 2px);
 		box-shadow: 2px 2px 0px rgba(0, 49, 83, 1);
+	}
+
+	.auth-submit-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+		box-shadow: 4px 4px 0px rgba(0, 49, 83, 1);
 	}
 
 	.auth-divider {

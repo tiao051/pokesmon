@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { formatPrice } from '~/data/products'
+import { formatPrice } from '../types/product'
 
 const props = defineProps({
   subtotal: { type: Number, required: true },
