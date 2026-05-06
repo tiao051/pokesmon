@@ -112,9 +112,10 @@ public class EmailService
     private async Task SendThemedEmailAsync(string toEmail, string subject, string finalHtmlContent)
     {
         var email = new MimeMessage();
-        var fromEmail = _config["SMTP_USER"];
+        var smtpUser = _config["SMTP_USER"];
+        var smtpPass = _config["SMTP_PASS"];
         
-        if (string.IsNullOrEmpty(fromEmail) || fromEmail.Contains("xxxxx"))
+        if (string.IsNullOrEmpty(smtpUser) || smtpUser.Contains("xxxxx") || string.IsNullOrEmpty(smtpPass))
         {
             Console.WriteLine($"\n--- [Mock Email Sent] ---");
             Console.WriteLine($"To: {toEmail}");
@@ -124,18 +125,18 @@ public class EmailService
             return;
         }
 
-        email.From.Add(MailboxAddress.Parse(fromEmail));
+        email.From.Add(MailboxAddress.Parse(smtpUser));
         email.To.Add(MailboxAddress.Parse(toEmail));
         email.Subject = subject;
 
         var builder = new BodyBuilder { HtmlBody = finalHtmlContent };
-        email.Body = builder.MessageBody;
+        email.Body = builder.ToMessageBody();
 
         using var smtp = new SmtpClient();
         try
         {
             await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_config["SMTP_USER"], _config["SMTP_PASS"]);
+            await smtp.AuthenticateAsync(smtpUser, smtpPass);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }
