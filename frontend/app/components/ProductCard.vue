@@ -64,6 +64,8 @@ const {src: imageSrc, isDataUrl} = useProductImage(productRef);
 						<line x1="5" y1="12" x2="19" y2="12" />
 					</svg>
 				</button>
+
+				<span v-if="product.isPreorder" class="preorder-corner-badge">Pre-order</span>
 			</div>
 			<div class="product-info">
 				<h4 class="product-title">{{ product.title }}</h4>
@@ -96,5 +98,24 @@ const {src: imageSrc, isDataUrl} = useProductImage(productRef);
 	height: 100%;
 	object-fit: cover;
 	display: block;
+}
+
+.preorder-corner-badge {
+	position: absolute;
+	top: 0.65rem;
+	left: 0.65rem;
+	font-family: var(--font-sans);
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 1.2px;
+	text-transform: uppercase;
+	padding: 0.3rem 0.55rem;
+	background: #b22222;
+	color: #fff;
+	border-radius: 4px;
+	line-height: 1;
+	box-shadow: 1.5px 1.5px 0 rgba(0, 49, 83, 0.25);
+	z-index: 2;
+	pointer-events: none;
 }
 </style>

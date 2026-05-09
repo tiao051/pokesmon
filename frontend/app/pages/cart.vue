@@ -26,17 +26,6 @@ const initialView = (() => {
 const view = ref(initialView) // 'standard' | 'preorder'
 const isPreorderView = computed(() => view.value === 'preorder')
 
-const swapView = () => {
-  view.value = isPreorderView.value ? 'standard' : 'preorder'
-}
-
-const swapButtonLabel = computed(() =>
-  isPreorderView.value ? 'View Standard Cart' : 'View Pre-order Cart',
-)
-const currentTypeLabel = computed(() =>
-  isPreorderView.value ? 'Pre-order Cart' : 'Standard Cart',
-)
-
 const activeItems = computed(() =>
   isPreorderView.value ? preorderItems.value : standardItems.value,
 )
@@ -85,39 +74,53 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
       <p v-if="headerSubtitle" class="page-subtitle">{{ headerSubtitle }}</p>
     </header>
 
-    <div class="controls-bar">
-      <div class="type-swap">
-        <span class="current-type">{{ currentTypeLabel }}</span>
-        <button
-          type="button"
-          class="swap-button"
-          :aria-label="swapButtonLabel"
-          @click="swapView"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="17 1 21 5 17 9" />
-            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-            <polyline points="7 23 3 19 7 15" />
-            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-          </svg>
-          {{ swapButtonLabel }}
-        </button>
-      </div>
+    <div class="cart-tabs" role="tablist" aria-label="Cart type">
+      <button
+        type="button"
+        class="cart-tab"
+        role="tab"
+        :aria-selected="!isPreorderView"
+        :class="{ active: !isPreorderView }"
+        @click="view = 'standard'"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-tab-label">Standard Cart</span>
+        <span class="cart-tab-count">{{ standardCount }}</span>
+      </button>
+      <button
+        type="button"
+        class="cart-tab cart-tab--preorder"
+        role="tab"
+        :aria-selected="isPreorderView"
+        :class="{ active: isPreorderView }"
+        @click="view = 'preorder'"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <path d="M8 14h.01"/>
+          <path d="M12 14h.01"/>
+          <path d="M16 14h.01"/>
+        </svg>
+        <span class="cart-tab-label">Pre-order Cart</span>
+        <span class="cart-tab-count">{{ preorderCount }}</span>
+      </button>
+    </div>
 
-      <div v-if="standardCount + preorderCount > 0" class="counts">
-        <span class="count-pill" :class="{ active: !isPreorderView }">
-          Standard · {{ standardCount }}
-        </span>
-        <span class="count-pill" :class="{ active: isPreorderView }">
-          Pre-order · {{ preorderCount }}
-        </span>
+    <div v-if="isPreorderView && activeItems.length > 0" class="preorder-banner">
+      <span class="preorder-banner-stamp" aria-hidden="true"></span>
+      <div class="preorder-banner-text">
+        <p class="preorder-banner-title">Pre-order Reservations</p>
+        <p class="preorder-banner-desc">
+          These items haven't arrived at the gallery yet. Pay a deposit today
+          (% varies by card rarity) and the remaining balance when they ship.
+        </p>
       </div>
     </div>
 
@@ -218,86 +221,146 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
   color: #555;
 }
 
-.controls-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px dashed rgba(0, 49, 83, 0.2);
-  flex-wrap: wrap;
+.cart-tabs {
+  display: inline-flex;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
 }
 
-.type-swap {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.current-type {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--color-prussian-blue);
-}
-
-.swap-button {
+.cart-tab {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--color-prussian-blue);
-  background: var(--color-sunflower-yellow);
-  border: 1.5px solid var(--color-prussian-blue);
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid rgba(0, 49, 83, 0.15);
   border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 2px 2px 0 var(--color-prussian-blue);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.swap-button:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--color-prussian-blue);
-}
-
-.swap-button:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 var(--color-prussian-blue);
-}
-
-.swap-button svg {
-  width: 14px;
-  height: 14px;
-}
-
-.counts {
-  display: inline-flex;
-  gap: 0.5rem;
-}
-
-.count-pill {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  background: rgba(0, 49, 83, 0.06);
   color: #777;
-  border: 1.5px solid transparent;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.count-pill.active {
+.cart-tab svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.cart-tab-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.3px;
+}
+
+.cart-tab-count {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(0, 49, 83, 0.1);
   color: var(--color-prussian-blue);
+  padding: 0 0.4rem;
+}
+
+.cart-tab:hover:not(.active) {
+  border-color: rgba(0, 49, 83, 0.3);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-prussian-blue);
+}
+
+.cart-tab.active {
   background: #fff;
-  border-color: rgba(0, 49, 83, 0.2);
+  color: var(--color-prussian-blue);
+  border-color: var(--color-prussian-blue);
+  box-shadow: 0 2px 6px rgba(0, 49, 83, 0.1);
+}
+
+.cart-tab--preorder.active {
+  border-color: #b22222;
+  color: #b22222;
+  box-shadow: 0 2px 6px rgba(178, 34, 34, 0.15);
+}
+
+.cart-tab--preorder.active .cart-tab-count {
+  background: rgba(178, 34, 34, 0.12);
+  color: #b22222;
+}
+
+.preorder-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(178, 34, 34, 0.09) 0%,
+    rgba(178, 34, 34, 0.02) 100%
+  );
+  border: 1.5px solid rgba(178, 34, 34, 0.25);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.preorder-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b22222 30%, #b22222 70%, transparent);
+  box-shadow: 0 0 10px rgba(178, 34, 34, 0.4);
+}
+
+.preorder-banner-stamp {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #fff 0 22%, #1a1a1a 22% 32%, transparent 32%),
+    linear-gradient(180deg, #b22222 0 47%, #1a1a1a 47% 53%, #fff 53% 100%);
+  border: 1.5px solid var(--color-prussian-blue);
+  box-shadow: 2px 2px 0 rgba(0, 49, 83, 0.2);
+  transform: rotate(-8deg);
+}
+
+.preorder-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.preorder-banner-title {
+  font-family: var(--font-serif);
+  color: #b22222;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.3px;
+}
+
+.preorder-banner-desc {
+  font-family: var(--font-sans);
+  color: #5c5c5c;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .preorder-banner {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
 }
 
 .cart-grid {

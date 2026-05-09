@@ -53,7 +53,10 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
     </NuxtLink>
 
     <div class="cart-line-info">
-      <span class="cart-line-category">{{ item.product.category }}</span>
+      <div class="cart-line-tags">
+        <span class="cart-line-category">{{ item.product.category }}</span>
+        <span v-if="item.product.isPreorder" class="cart-line-preorder-badge">Pre-order</span>
+      </div>
       <NuxtLink :to="`/products/${item.product.slug}`" class="cart-line-title">{{ item.product.title }}</NuxtLink>
       <p class="cart-line-price">{{ formatPrice(item.product.price) }} each</p>
     </div>
@@ -142,12 +145,33 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
   min-width: 0;
 }
 
+.cart-line-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
 .cart-line-category {
   font-family: var(--font-serif);
   font-style: italic;
   color: #C2821B;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
+}
+
+.cart-line-preorder-badge {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  background: rgba(178, 34, 34, 0.1);
+  color: #b22222;
+  border: 1px solid rgba(178, 34, 34, 0.3);
+  border-radius: 4px;
+  line-height: 1;
 }
 
 .cart-line-title {
