@@ -1,55 +1,34 @@
-using Microsoft.AspNetCore.Builder;
+using backend.Infrastructure.Configuration;
+using backend.Infrastructure.Persistence;
 
-// Load .env file
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddSingleton<backend.Infrastructure.Persistence.MongoDbContext>();
-builder.Services.AddScoped<backend.Application.Services.TokenService>();
-builder.Services.AddScoped<backend.Application.Services.EmailService>();
-
-// Configure JWT Authentication
-var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "123456789aA_FallbackSecretKeyForDev";
-builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret)),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
+builder.Services
+    .AddPersistence()
+    .AddApplicationServices()
+    .AddJwtAuth(builder.Configuration)
+    .AddCorsPolicy(builder.Configuration)
+    .AddAuthRateLimiting();
 
 builder.Services.AddControllers();
-builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Configure CORS for frontend access
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000")
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-});
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var mongo = scope.ServiceProvider.GetRequiredService<backend.Infrastructure.Persistence.MongoDbContext>();
-    await backend.Infrastructure.Persistence.DbSeeder.SeedAsync(mongo);
+    var mongo = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+    await IndexInitializer.EnsureIndexesAsync(mongo);
+    if (app.Environment.IsDevelopment())
+        await DbSeeder.SeedAsync(mongo, builder.Configuration);
 }
 
+app.UseExceptionHandler();
 app.UseCors("AllowFrontend");
-app.UseAuthentication();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -57,10 +36,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 
 app.Run();
-

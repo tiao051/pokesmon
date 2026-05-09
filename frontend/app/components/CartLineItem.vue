@@ -1,15 +1,15 @@
-<script setup>
-import { ref, computed } from 'vue'
-import { formatPrice } from '../types/product'
+<script setup lang="ts">
+import { computed, ref, toRef } from 'vue'
+import type { CartItem } from '../composables/useCart'
+import { useProductImage } from '../composables/useProductImage'
+import { formatPrice } from '../utils/format'
 
-const props = defineProps({
-  item: { type: Object, required: true }
-})
+const props = defineProps<{ item: CartItem }>()
 
 const { updateQty, remove } = useCart()
 const showConfirm = ref(false)
 
-const handleQtyUpdate = (newQty) => {
+const handleQtyUpdate = (newQty: number) => {
   updateQty(props.item.product.id, newQty)
 }
 
@@ -21,20 +21,8 @@ const confirmRemove = () => {
   remove(props.item.product.id)
 }
 
-const isThumbLoaded = ref(false)
-const onThumbLoad = () => {
-  isThumbLoaded.value = true
-}
-
-const thumbSrc = computed(() => {
-  const p = props.item.product
-  if (p.imageBase64) {
-    const base64 = p.imageBase64
-    if (base64.startsWith('data:')) return base64
-    return `data:image/png;base64,${base64}`
-  }
-  return p.image || '/images/loading_gif.gif'
-})
+const productRef = computed(() => props.item.product)
+const { src: thumbSrc, isDataUrl: thumbIsDataUrl } = useProductImage(productRef)
 
 const lineTotal = computed(() => formatPrice(props.item.product.price * props.item.quantity))
 </script>
@@ -42,19 +30,26 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
 <template>
   <div class="cart-line">
     <NuxtLink :to="`/products/${item.product.slug}`" class="cart-thumb">
-      <!-- Main Thumb -->
-      <img 
-        :src="thumbSrc" 
-        :alt="item.product.title" 
-        :class="{ 'is-hidden': !isThumbLoaded }"
-        @load="onThumbLoad"
-        @error="onThumbLoad"
+      <img
+        v-if="thumbIsDataUrl"
+        :src="thumbSrc"
+        :alt="item.product.title"
+        width="100"
+        height="125"
+        loading="lazy"
+        decoding="async"
       />
-      
-      <!-- Loading Overlay -->
-      <div v-if="!isThumbLoaded" class="thumb-loading-overlay">
-        <img src="/images/loading_gif.gif" alt="Loading..." class="loading-gif" />
-      </div>
+      <NuxtImg
+        v-else-if="thumbSrc"
+        :src="thumbSrc"
+        :alt="item.product.title"
+        width="100"
+        height="125"
+        sizes="xs:100px sm:100px"
+        loading="lazy"
+        decoding="async"
+        placeholder
+      />
     </NuxtLink>
 
     <div class="cart-line-info">
@@ -133,32 +128,11 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
   position: relative;
 }
 
-.cart-thumb img {
+.cart-thumb :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
-}
-
-.cart-thumb img.is-hidden {
-  opacity: 0;
-  position: absolute;
-}
-
-.thumb-loading-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-linen);
-  z-index: 1;
-}
-
-.thumb-loading-overlay .loading-gif {
-  width: 40%;
-  height: auto;
 }
 
 .cart-line-info {

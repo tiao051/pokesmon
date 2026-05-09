@@ -1,0 +1,124 @@
+/* Shared utilities — see component scopes for layout-specific styles. */
+
+/* ── Skeleton shimmer ─────────────────────────────────────────── */
+.skeleton {
+	background: linear-gradient(90deg, #e8e5d8 25%, #ddd9c8 50%, #e8e5d8 75%);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite;
+	border: 1px solid rgba(0, 49, 83, 0.08);
+	border-radius: 12px;
+}
+
+.skeleton-card {
+	aspect-ratio: 4 / 5;
+}
+
+@keyframes shimmer {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}
+
+/* ── Eyebrow text ─────────────────────────────────────────────── */
+.eyebrow {
+	font-family: var(--font-serif);
+	font-style: italic;
+	letter-spacing: 2px;
+	color: #c2821b;
+	font-size: 0.8rem;
+}
+
+.gold-italic {
+	font-family: var(--font-serif);
+	font-style: italic;
+	letter-spacing: 1.5px;
+	color: #c2821b;
+	font-size: 0.8rem;
+}
+
+.gold-text { color: var(--color-sunflower-yellow); }
+.white-text { color: #fff; }
+.white-text-muted { color: rgba(255, 255, 255, 0.85); }
+
+/* ── Page header (page title + subtitle, centered) ────────────── */
+.page-header {
+	text-align: center;
+	margin-bottom: clamp(2rem, 5vw, 3rem);
+	padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) 0;
+}
+
+.page-title {
+	font-family: var(--font-serif);
+	font-size: clamp(2.25rem, 5vw, 3rem);
+	color: var(--color-prussian-blue);
+	margin-bottom: 0.5rem;
+	letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+	font-family: var(--font-sans);
+	color: #5b5b5b;
+	font-size: clamp(0.95rem, 2vw, 1.05rem);
+}
+
+/* ── Museum-style buttons ─────────────────────────────────────── */
+.btn-primary-museum,
+.btn-secondary-museum {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.85rem 1.75rem;
+	font-family: var(--font-sans);
+	font-weight: 700;
+	font-size: 0.85rem;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 25px 5px 20px 5px / 5px 20px 5px 25px;
+	transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+		box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.btn-primary-museum {
+	background-color: var(--color-sunflower-yellow);
+	border: 2px solid var(--color-prussian-blue);
+	color: var(--color-prussian-blue);
+	box-shadow: 3px 3px 0 var(--color-prussian-blue);
+}
+
+.btn-primary-museum:hover {
+	transform: translate(-2px, -2px);
+	box-shadow: 5px 5px 0 var(--color-prussian-blue);
+	background-color: #ffcf33;
+}
+
+.btn-primary-museum:active {
+	transform: translate(1px, 1px);
+	box-shadow: 1px 1px 0 var(--color-prussian-blue);
+}
+
+.btn-secondary-museum {
+	background-color: transparent;
+	border: 2px solid var(--color-prussian-blue);
+	color: var(--color-prussian-blue);
+	box-shadow: 3px 3px 0 rgba(0, 49, 83, 0.15);
+}
+
+.btn-secondary-museum:hover {
+	background-color: rgba(0, 49, 83, 0.05);
+	transform: translate(-2px, -2px);
+	box-shadow: 5px 5px 0 rgba(0, 49, 83, 0.3);
+}
+
+/* ── Brush divider ────────────────────────────────────────────── */
+.brush-divider {
+	height: 6px;
+	margin: 1.25rem auto;
+	width: 80%;
+	background-image: radial-gradient(
+		ellipse at center,
+		rgba(0, 49, 83, 0.35) 0%,
+		rgba(0, 49, 83, 0) 70%
+	);
+}

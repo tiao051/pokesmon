@@ -1,4 +1,6 @@
+import {computed} from "vue";
 import {authService} from "../services/authService";
+import {usePersistedState} from "./usePersistedState";
 
 export interface Location {
 	id: string;
@@ -24,94 +26,51 @@ export interface AuthState {
 export type ProfilePatch = Partial<Pick<AuthState, "displayName" | "phone">>;
 
 const STORAGE_KEY = "pokegogh-auth";
-const SIMULATED_LATENCY_MS = 350;
-let hydrated = false;
 
 const generateId = (): string => {
-	if (
-		typeof crypto !== "undefined" &&
-		typeof crypto.randomUUID === "function"
-	) {
+	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
 		return crypto.randomUUID();
 	}
 	return `loc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
-const SAMPLE_LOCATIONS: Location[] = [
-	{
-		id: "sample-pallet",
-		label: "Pallet Town Cabin",
-		address: "Số 1, Đường Hướng Dương",
-		city: "Pallet Town",
-		country: "Kanto",
-		isDefault: true,
-	},
-	{
-		id: "sample-pewter",
-		label: "Pewter Loft",
-		address: "Stone Street 22, Apt 7",
-		city: "Pewter City",
-		country: "Kanto",
-		isDefault: false,
-	},
-];
+const validateLocationInput = (input: LocationInput | LocationPatch) => {
+	for (const key of ["label", "address", "city", "country"] as const) {
+		const v = input[key];
+		if (v !== undefined && !v.trim()) {
+			throw new Error(`${key} cannot be empty`);
+		}
+	}
+};
 
 export const useAuth = () => {
-	const state = useState<AuthState>("auth", () => ({isLoggedIn: false}));
-
-	if (process.client && !hydrated) {
-		hydrated = true;
-		try {
-			const raw = localStorage.getItem(STORAGE_KEY);
-			if (raw) {
-				const parsed = JSON.parse(raw) as AuthState;
-				if (parsed && typeof parsed.isLoggedIn === "boolean")
-					state.value = parsed;
-			}
-		} catch {
-			// ignore
-		}
-		if (state.value.locations === undefined) {
-			state.value = {...state.value, locations: [...SAMPLE_LOCATIONS]};
-		}
-		watch(
-			state,
-			(v) => {
-				try {
-					localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
-				} catch {
-					// ignore
-				}
-			},
-			{deep: true},
-		);
-	}
+	const state = usePersistedState<AuthState>(STORAGE_KEY, {isLoggedIn: false}, "auth");
 
 	const signIn = async (email: string, password: string) => {
 		const data = await authService.login({email, password});
 		state.value = {
+			...state.value,
 			isLoggedIn: true,
 			email: data.user.email,
-			locations: state.value.locations ?? [...SAMPLE_LOCATIONS],
 		};
 		return data;
 	};
 
-	const signUp = async (email: string, password: string) => {
-		return await authService.register({email, password});
-	};
+	const signUp = async (email: string, password: string) =>
+		authService.register({email, password});
 
 	const verifyEmail = async (email: string, pin: string) => {
 		const data = await authService.verifyEmail({email, pin});
 		state.value = {
+			...state.value,
 			isLoggedIn: true,
 			email: data.user.email,
-			locations: state.value.locations ?? [...SAMPLE_LOCATIONS],
 		};
 		return data;
 	};
 
 	const signOut = () => {
+		authService.logout();
 		state.value = {isLoggedIn: false};
 	};
 
@@ -131,13 +90,13 @@ export const useAuth = () => {
 		state.value = next;
 	};
 
-	const changePassword = async (current: string, next: string) => {
-		if (!current) throw new Error("Current password is required");
-		if (!next || next.length < 8)
+	const changePassword = async (currentPassword: string, newPassword: string) => {
+		if (!currentPassword) throw new Error("Current password is required");
+		if (!newPassword || newPassword.length < 8)
 			throw new Error("New password must be at least 8 characters");
-		if (current === next)
+		if (currentPassword === newPassword)
 			throw new Error("New password must differ from current password");
-		await new Promise((resolve) => setTimeout(resolve, 700));
+		await authService.changePassword({currentPassword, newPassword});
 		return true;
 	};
 
@@ -147,28 +106,14 @@ export const useAuth = () => {
 		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
 			throw new Error("Please enter a valid email address");
 		}
-		return await authService.requestPasswordReset({email: trimmed});
+		return authService.requestPasswordReset({email: trimmed});
 	};
 
 	// Locations API.
-	// Backed by localStorage today; replace each body with a $fetch call when the
-	// backend is wired (e.g. POST /api/locations, PATCH /api/locations/:id).
-	// Method signatures are the contract — keep them stable.
-
-	const validateLocationInput = (input: LocationInput | LocationPatch) => {
-		for (const key of ["label", "address", "city", "country"] as const) {
-			const v = input[key];
-			if (v !== undefined && !v.trim()) {
-				throw new Error(`${key} cannot be empty`);
-			}
-		}
-	};
-
+	// TODO: backend endpoints not yet wired. These mutate the persisted client-side
+	// state only — replace each body with an API call when the locations module ships.
 	const addLocation = async (input: LocationInput): Promise<Location> => {
 		validateLocationInput(input);
-		await new Promise((resolve) =>
-			setTimeout(resolve, SIMULATED_LATENCY_MS),
-		);
 		const existing = state.value.locations ?? [];
 		const created: Location = {
 			id: generateId(),
@@ -182,14 +127,8 @@ export const useAuth = () => {
 		return created;
 	};
 
-	const updateLocation = async (
-		id: string,
-		patch: LocationPatch,
-	): Promise<Location> => {
+	const updateLocation = async (id: string, patch: LocationPatch): Promise<Location> => {
 		validateLocationInput(patch);
-		await new Promise((resolve) =>
-			setTimeout(resolve, SIMULATED_LATENCY_MS),
-		);
 		const existing = state.value.locations ?? [];
 		const idx = existing.findIndex((l) => l.id === id);
 		if (idx === -1) throw new Error("Location not found");
@@ -208,9 +147,6 @@ export const useAuth = () => {
 	};
 
 	const removeLocation = async (id: string): Promise<void> => {
-		await new Promise((resolve) =>
-			setTimeout(resolve, SIMULATED_LATENCY_MS),
-		);
 		const existing = state.value.locations ?? [];
 		const target = existing.find((l) => l.id === id);
 		if (!target) return;
@@ -222,12 +158,8 @@ export const useAuth = () => {
 	};
 
 	const setDefaultLocation = async (id: string): Promise<void> => {
-		await new Promise((resolve) =>
-			setTimeout(resolve, SIMULATED_LATENCY_MS),
-		);
 		const existing = state.value.locations ?? [];
-		if (!existing.some((l) => l.id === id))
-			throw new Error("Location not found");
+		if (!existing.some((l) => l.id === id)) throw new Error("Location not found");
 		state.value = {
 			...state.value,
 			locations: existing.map((l) => ({...l, isDefault: l.id === id})),

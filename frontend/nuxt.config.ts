@@ -4,9 +4,10 @@ export default defineNuxtConfig({
 	ssr: false,
 	devtools: {enabled: true},
 	modules: ["@nuxt/image"],
+	css: ["~/assets/css/global.css"],
 	runtimeConfig: {
 		public: {
-			apiBaseUrl: "http://localhost:5044/api",
+			apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:5044/api",
 		},
 	},
 	image: {

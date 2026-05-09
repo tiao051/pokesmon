@@ -41,7 +41,6 @@
 		data: productsData,
 		pending: productsLoading,
 		error: productsError,
-		refresh: refreshProducts,
 	} = await useAsyncData(
 		"products-list",
 		() => productService.getProducts(queryParams.value),
@@ -50,40 +49,6 @@
 
 	const filteredProducts = computed(() => productsData.value?.items ?? []);
 	const filteredCount = computed(() => productsData.value?.total ?? 0);
-	const totalPages = computed(() => Math.ceil(filteredCount.value / limit));
-
-	const visiblePages = computed(() => {
-		const total = totalPages.value;
-		const current = page.value;
-		const delta = 1;
-		const range = [];
-		const rangeWithDots = [];
-		let l;
-
-		for (let i = 1; i <= total; i++) {
-			if (
-				i === 1 ||
-				i === total ||
-				(i >= current - delta && i <= current + delta)
-			) {
-				range.push(i);
-			}
-		}
-
-		for (let i of range) {
-			if (l) {
-				if (i - l === 2) {
-					rangeWithDots.push(l + 1);
-				} else if (i - l !== 1) {
-					rangeWithDots.push("...");
-				}
-			}
-			rangeWithDots.push(i);
-			l = i;
-		}
-
-		return rangeWithDots;
-	});
 
 	useHead({title: "The Collection — PokéGogh"});
 </script>
@@ -203,7 +168,7 @@
 			v-if="productsLoading && !filteredProducts.length"
 			class="product-grid"
 		>
-			<div v-for="n in 8" :key="n" class="product-card-skeleton"></div>
+			<div v-for="n in 8" :key="n" class="skeleton skeleton-card"></div>
 		</div>
 
 		<p v-else-if="productsError" class="categories-error">
@@ -223,44 +188,12 @@
 			message="No artifacts match this filter. Try another wing of the museum."
 		/>
 
-		<!-- Pagination -->
-		<div v-if="totalPages > 1" class="pagination">
-			<button
-				class="page-btn prev-btn"
-				:disabled="page === 1"
-				@click="page--"
-				aria-label="Previous page"
-			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-					<polyline points="15 18 9 12 15 6"></polyline>
-				</svg>
-			</button>
-
-			<div class="page-numbers">
-				<template v-for="(p, idx) in visiblePages" :key="idx">
-					<span v-if="p === '...'" class="page-ellipsis">...</span>
-					<button
-						v-else
-						class="page-number"
-						:class="{ active: page === p }"
-						@click="page = p"
-					>
-						{{ p }}
-					</button>
-				</template>
-			</div>
-
-			<button
-				class="page-btn next-btn"
-				:disabled="page === totalPages"
-				@click="page++"
-				aria-label="Next page"
-			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-					<polyline points="9 18 15 12 9 6"></polyline>
-				</svg>
-			</button>
-		</div>
+		<AppPagination
+			:current-page="page"
+			:total-items="filteredCount"
+			:page-size="limit"
+			@update:current-page="(p) => (page = p)"
+		/>
 	</main>
 </template>
 
@@ -488,148 +421,4 @@
 		width: 100%;
 	}
 
-	/* Pagination */
-	.pagination {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 2rem;
-		margin-top: 6rem;
-		padding-top: 4rem;
-		border-top: 1px solid rgba(0, 49, 83, 0.1);
-		position: relative;
-	}
-
-	.pagination::before {
-		content: "";
-		position: absolute;
-		top: -1px;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 120px;
-		height: 3px;
-		background: var(--color-sunflower-yellow);
-		border-radius: 2px;
-	}
-
-	.page-btn {
-		width: 52px;
-		height: 52px;
-		border-radius: 50%;
-		border: 2px solid var(--color-prussian-blue);
-		background: #fff;
-		color: var(--color-prussian-blue);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-		box-shadow: 4px 4px 0 rgba(0, 49, 83, 0.1);
-	}
-
-	.page-btn:hover:not(:disabled) {
-		background-color: var(--color-prussian-blue);
-		color: #fff;
-		transform: translateY(-3px) scale(1.05);
-		box-shadow: 6px 6px 0 rgba(0, 49, 83, 0.15);
-	}
-
-	.page-btn:active:not(:disabled) {
-		transform: translateY(-1px);
-		box-shadow: 2px 2px 0 rgba(0, 49, 83, 0.1);
-	}
-
-	.page-btn:disabled {
-		opacity: 0.25;
-		cursor: not-allowed;
-		filter: grayscale(1);
-		border-color: #ccc;
-		box-shadow: none;
-	}
-
-	.page-btn svg {
-		width: 22px;
-		height: 22px;
-	}
-
-	.page-numbers {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-	}
-
-	.page-number {
-		min-width: 46px;
-		height: 46px;
-		padding: 0 0.5rem;
-		border-radius: 12px;
-		border: 2px solid transparent;
-		background: transparent;
-		color: var(--color-prussian-blue);
-		font-family: var(--font-serif);
-		font-weight: 700;
-		font-size: 1.2rem;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		position: relative;
-	}
-
-	.page-number::after {
-		content: "";
-		position: absolute;
-		bottom: 6px;
-		left: 50%;
-		transform: translateX(-50%) scaleX(0);
-		width: 20px;
-		height: 2px;
-		background: var(--color-cypress-green);
-		transition: transform 0.3s ease;
-	}
-
-	.page-number:hover:not(.active) {
-		color: var(--color-cypress-green);
-		background: rgba(0, 49, 83, 0.04);
-	}
-
-	.page-number:hover::after {
-		transform: translateX(-50%) scaleX(1);
-	}
-
-	.page-number.active {
-		background-color: var(--color-sunflower-yellow);
-		border-color: var(--color-prussian-blue);
-		color: var(--color-prussian-blue);
-		box-shadow: 3px 3px 0 rgba(0, 49, 83, 0.15);
-		transform: translateY(-2px);
-	}
-
-	.page-ellipsis {
-		font-family: var(--font-serif);
-		color: #999;
-		font-size: 1.2rem;
-		font-weight: 700;
-		padding: 0 0.25rem;
-		letter-spacing: 2px;
-	}
-
-	@media (max-width: 600px) {
-		.pagination {
-			gap: 1rem;
-		}
-		.page-numbers {
-			gap: 0.5rem;
-		}
-		.page-btn {
-			width: 44px;
-			height: 44px;
-		}
-		.page-number {
-			min-width: 38px;
-			height: 38px;
-			font-size: 1rem;
-		}
-	}
 </style>

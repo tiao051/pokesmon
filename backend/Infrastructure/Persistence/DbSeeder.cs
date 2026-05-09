@@ -5,23 +5,23 @@ namespace backend.Infrastructure.Persistence;
 
 public static class DbSeeder
 {
-    public const string SeedEmail = "admin@pokemon.local";
-    public const string SeedPassword = "Admin123!";
-
-    public static async Task SeedAsync(MongoDbContext context)
+    public static async Task SeedAsync(MongoDbContext context, IConfiguration config)
     {
-        if (await context.Users.Find(u => u.Email == SeedEmail).AnyAsync())
-        {
+        var seedEmail = config["SEED_ADMIN_EMAIL"];
+        var seedPassword = config["SEED_ADMIN_PASSWORD"];
+
+        if (string.IsNullOrWhiteSpace(seedEmail) || string.IsNullOrWhiteSpace(seedPassword))
             return;
-        }
+
+        if (await context.Users.Find(u => u.Email == seedEmail).AnyAsync())
+            return;
 
         var user = new User
         {
-            Email = SeedEmail,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(SeedPassword),
+            Email = seedEmail,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
             IsVerified = true
         };
-
         await context.Users.InsertOneAsync(user);
     }
 }

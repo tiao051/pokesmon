@@ -1,6 +1,6 @@
 # Pokemon Project — Claude Instructions
 
-A learning project pairing an ASP.NET Core minimal API with a Nuxt 4 frontend. Keep solutions simple and let architecture grow with real needs, not anticipated ones.
+Production e-commerce app pairing an ASP.NET Core minimal API with a Nuxt 4 frontend. Real users will use it once deployed — apply production-grade rigor: validate inputs, log with context, optimize images and indexes, handle errors with consistent shapes, never ship mocks/setTimeout placeholders to user-visible flows. KISS still applies, but don't skip validation/security/observability citing "small project."
 
 ## Stack (current reality)
 

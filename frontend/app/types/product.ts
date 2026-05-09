@@ -4,6 +4,7 @@ export interface Product {
 	title: string;
 	price: number;
 	image: string;
+	imageBase64?: string | null;
 	description: string;
 	stock: number;
 	category: string;
@@ -14,6 +15,5 @@ export interface Product {
 	tags: string[];
 }
 
-export function formatPrice(price: number): string {
-	return `$${price.toFixed(2)}`;
-}
+// Re-export for backwards compatibility with existing imports.
+export { formatPrice } from "../utils/format";

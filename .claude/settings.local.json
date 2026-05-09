@@ -1,13 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C /d/pet-project/pokemon ls-files .agents)",
-      "Bash(git -C /d/pet-project/pokemon status --short)",
       "Bash(git *)",
-      "Bash(dotnet build *)",
-      "Bash(npm install *)",
-      "Bash(timeout 30 npx nuxi prepare)",
-      "Bash(npx nuxi *)"
+      "Bash(dotnet *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(echo *)",
+      "Bash(test *)",
+      "Bash(cd *)",
+      "Bash(timeout *)",
+      "Bash(true *)",
+      "Bash(:)"
     ]
   }
 }

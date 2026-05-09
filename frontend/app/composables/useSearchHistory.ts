@@ -1,42 +1,22 @@
-import { ref, onMounted } from 'vue'
+import {usePersistedState} from "./usePersistedState";
+
+const STORAGE_KEY = "pokegogh-search-history";
+const MAX_TERMS = 5;
 
 export function useSearchHistory() {
-  const history = ref<string[]>([])
+	const history = usePersistedState<string[]>(STORAGE_KEY, [], "search-history");
 
-  onMounted(() => {
-    const saved = localStorage.getItem('pokesmon_search_history')
-    if (saved) {
-      try {
-        history.value = JSON.parse(saved)
-      } catch (e) {
-        history.value = []
-      }
-    }
-  })
+	const addSearchTerm = (term: string) => {
+		const trimmed = term.trim();
+		if (!trimmed) return;
+		const next = history.value.filter((t) => t !== trimmed);
+		next.unshift(trimmed);
+		history.value = next.slice(0, MAX_TERMS);
+	};
 
-  const addSearchTerm = (term: string) => {
-    if (!term.trim()) return
-    const current = [...history.value]
-    const index = current.indexOf(term.trim())
-    if (index > -1) {
-      current.splice(index, 1)
-    }
-    current.unshift(term.trim())
-    if (current.length > 5) {
-      current.pop()
-    }
-    history.value = current
-    localStorage.setItem('pokesmon_search_history', JSON.stringify(current))
-  }
+	const clearHistory = () => {
+		history.value = [];
+	};
 
-  const clearHistory = () => {
-    history.value = []
-    localStorage.removeItem('pokesmon_search_history')
-  }
-
-  return {
-    history,
-    addSearchTerm,
-    clearHistory
-  }
+	return {history, addSearchTerm, clearHistory};
 }

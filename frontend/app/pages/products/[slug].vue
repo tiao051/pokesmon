@@ -80,10 +80,6 @@
 		return product.value?.image || "";
 	});
 
-	const isActualDataUrl = computed(() =>
-		actualImageSrc.value.startsWith("data:"),
-	);
-
 	const displayImageSrc = computed(() =>
 		showRealImage.value ? actualImageSrc.value : placeholderImage,
 	);

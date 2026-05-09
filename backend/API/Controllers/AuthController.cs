@@ -1,149 +1,86 @@
-using Microsoft.AspNetCore.Mvc;
-using backend.Core.Entities;
-using backend.Core.DTOs;
-using backend.Infrastructure.Persistence;
+using System.Security.Claims;
 using backend.Application.Services;
-using MongoDB.Driver;
+using backend.Core.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("auth")]
 public class AuthController : ControllerBase
 {
-    private readonly MongoDbContext _context;
-    private readonly TokenService _tokenService;
-    private readonly EmailService _emailService;
+    private readonly AuthService _authService;
 
-    public AuthController(MongoDbContext context, TokenService tokenService, EmailService emailService)
-    {
-        _context = context;
-        _tokenService = tokenService;
-        _emailService = emailService;
-    }
+    public AuthController(AuthService authService) => _authService = authService;
 
     [HttpPost("register")]
-    public async Task<ActionResult> Register(RegisterDto dto)
+    public async Task<ActionResult> Register(RegisterDto dto, CancellationToken ct)
     {
-        if (await _context.Users.Find(u => u.Email == dto.Email).AnyAsync())
-        {
-            return BadRequest("Email is already registered");
-        }
-
-        var user = new User
-        {
-            Email = dto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            IsVerified = false
-        };
-
-        await _context.Users.InsertOneAsync(user);
-
-        // Generate Registration PIN
-        var pin = new Random().Next(100000, 999999).ToString();
-        var regPin = new RegistrationPin
-        {
-            Email = user.Email,
-            Pin = pin,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15)
-        };
-        await _context.RegistrationPins.InsertOneAsync(regPin);
-
-        // Send PIN email asynchronously
-        _ = _emailService.SendRegistrationPinEmailAsync(user.Email, pin);
-
-        return Ok(new { message = "Registration successful. Please check your email for the verification PIN." });
+        var result = await _authService.RegisterAsync(dto, ct);
+        return ToActionResult(result, _ => Ok(new { message = "Registration successful. Please check your email for the verification PIN." }));
     }
 
     [HttpPost("verify-email")]
-    public async Task<ActionResult<AuthResponseDto>> VerifyEmail(VerifyEmailDto dto)
+    public async Task<ActionResult> VerifyEmail(VerifyEmailDto dto, CancellationToken ct)
     {
-        var pinRecord = await _context.RegistrationPins
-            .Find(p => p.Email == dto.Email && p.Pin == dto.Pin)
-            .FirstOrDefaultAsync();
-
-        if (pinRecord == null || pinRecord.ExpiresAt < DateTime.UtcNow)
-        {
-            return BadRequest("Invalid or expired PIN.");
-        }
-
-        var user = await _context.Users.Find(u => u.Email == dto.Email).FirstOrDefaultAsync();
-        if (user == null) return NotFound("User not found.");
-
-        user.IsVerified = true;
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
-        await _context.RegistrationPins.DeleteManyAsync(p => p.Email == dto.Email); // clean up pins
-
-        var token = _tokenService.GenerateToken(user);
-        var userDto = new UserDto(user.Id!, user.Email, user.IsVerified);
-
-        return Ok(new AuthResponseDto(userDto, token));
+        var result = await _authService.VerifyEmailAsync(dto, ct);
+        return ToActionResult(result, v => Ok(v));
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponseDto>> Login(LoginDto dto)
+    public async Task<ActionResult> Login(LoginDto dto, CancellationToken ct)
     {
-        var user = await _context.Users.Find(u => u.Email == dto.Email).FirstOrDefaultAsync();
-        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-        {
-            return Unauthorized("Invalid credentials");
-        }
-
-        if (!user.IsVerified)
-        {
-            return Unauthorized("Please verify your email before logging in.");
-        }
-
-        var token = _tokenService.GenerateToken(user);
-        var userDto = new UserDto(user.Id!, user.Email, user.IsVerified);
-
-        return Ok(new AuthResponseDto(userDto, token));
+        var result = await _authService.LoginAsync(dto, ct);
+        return ToActionResult(result, v => Ok(v));
     }
 
     [HttpPost("request-password-reset")]
-    public async Task<ActionResult> RequestPasswordReset(RequestPasswordResetDto dto)
+    public async Task<ActionResult> RequestPasswordReset(RequestPasswordResetDto dto, CancellationToken ct)
     {
-        var user = await _context.Users.Find(u => u.Email == dto.Email).FirstOrDefaultAsync();
-        if (user == null)
-        {
-            // Return Ok anyway to prevent email enumeration
-            return Ok(new { message = "If the email is registered, a password reset PIN has been sent." });
-        }
-
-        var pin = new Random().Next(100000, 999999).ToString();
-        var resetPin = new ResetPasswordPin
-        {
-            Email = user.Email,
-            Pin = pin,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15)
-        };
-        await _context.ResetPasswordPins.InsertOneAsync(resetPin);
-
-        _ = _emailService.SendResetPasswordPinEmailAsync(user.Email, pin);
-
+        await _authService.RequestPasswordResetAsync(dto, ct);
         return Ok(new { message = "If the email is registered, a password reset PIN has been sent." });
     }
 
     [HttpPost("reset-password")]
-    public async Task<ActionResult> ResetPassword(ResetPasswordDto dto)
+    public async Task<ActionResult> ResetPassword(ResetPasswordDto dto, CancellationToken ct)
     {
-        var pinRecord = await _context.ResetPasswordPins
-            .Find(p => p.Email == dto.Email && p.Pin == dto.Pin)
-            .FirstOrDefaultAsync();
-
-        if (pinRecord == null || pinRecord.ExpiresAt < DateTime.UtcNow)
-        {
-            return BadRequest("Invalid or expired PIN.");
-        }
-
-        var user = await _context.Users.Find(u => u.Email == dto.Email).FirstOrDefaultAsync();
-        if (user == null) return NotFound("User not found.");
-
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user);
-        
-        await _context.ResetPasswordPins.DeleteManyAsync(p => p.Email == dto.Email); // clean up pins
-
-        return Ok(new { message = "Password has been successfully reset. You can now login." });
+        var result = await _authService.ResetPasswordAsync(dto, ct);
+        return ToActionResult(result, _ => Ok(new { message = "Password has been successfully reset. You can now login." }));
     }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword(ChangePasswordDto dto, CancellationToken ct)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+        if (string.IsNullOrEmpty(email)) return Unauthorized(new { error = "Invalid token" });
+
+        var result = await _authService.ChangePasswordAsync(email, dto, ct);
+        return ToActionResult(result, _ => Ok(new { message = "Password changed successfully." }));
+    }
+
+    private ActionResult ToActionResult(AuthOperationResult result, Func<object?, ActionResult> onSuccess)
+        => result.Kind switch
+        {
+            AuthResultKind.Ok => onSuccess(null),
+            AuthResultKind.BadRequest => BadRequest(new { error = result.Error }),
+            AuthResultKind.Unauthorized => Unauthorized(new { error = result.Error }),
+            AuthResultKind.NotFound => NotFound(new { error = result.Error }),
+            AuthResultKind.Conflict => Conflict(new { error = result.Error }),
+            _ => StatusCode(500, new { error = "Unexpected error" })
+        };
+
+    private ActionResult ToActionResult<T>(AuthOperationResult<T> result, Func<T, ActionResult> onSuccess)
+        => result.Kind switch
+        {
+            AuthResultKind.Ok => onSuccess(result.Value!),
+            AuthResultKind.BadRequest => BadRequest(new { error = result.Error }),
+            AuthResultKind.Unauthorized => Unauthorized(new { error = result.Error }),
+            AuthResultKind.NotFound => NotFound(new { error = result.Error }),
+            AuthResultKind.Conflict => Conflict(new { error = result.Error }),
+            _ => StatusCode(500, new { error = "Unexpected error" })
+        };
 }

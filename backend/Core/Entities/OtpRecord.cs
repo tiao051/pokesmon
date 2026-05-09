@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace backend.Core.Entities;
 
-public class ResetPasswordPin
+public class OtpRecord
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -12,8 +12,11 @@ public class ResetPasswordPin
     [BsonElement("email")]
     public string Email { get; set; } = string.Empty;
 
-    [BsonElement("pin")]
-    public string Pin { get; set; } = string.Empty;
+    [BsonElement("pinHash")]
+    public string PinHash { get; set; } = string.Empty;
+
+    [BsonElement("attempts")]
+    public int Attempts { get; set; }
 
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

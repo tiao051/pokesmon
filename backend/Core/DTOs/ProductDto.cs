@@ -1,12 +1,5 @@
 namespace backend.Core.DTOs;
 
-public record ProductDto(int Id, string Name, string Description, decimal Price, string ImageUrl);
-
-public record CreateProductDto(string Name, string Description, decimal Price, string ImageUrl);
-
-/// <summary>
-/// API response shape matching what the frontend expects.
-/// </summary>
 public record ProductResponse(
     int Id,
     string Slug,
@@ -23,3 +16,14 @@ public record ProductResponse(
     bool Sealed,
     List<string> Tags
 );
+
+public record ProductListResponse(
+    List<ProductResponse> Items,
+    long Total,
+    int Page,
+    int Limit
+);
+
+public record CategoriesResponse(List<string> ProductTypes, List<string> SetNames);
+
+public record ProductDetailResponse(ProductResponse Product, List<ProductResponse> Related);

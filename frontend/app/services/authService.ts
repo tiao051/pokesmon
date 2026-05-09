@@ -1,38 +1,9 @@
-import axios, { type AxiosInstance } from "axios";
-
-const API_BASE_URL = "http://localhost:5044/api";
-
-let _api: AxiosInstance | null = null;
-
-function getApi(): AxiosInstance {
-	if (_api) return _api;
-	_api = axios.create({
-		baseURL: API_BASE_URL,
-		headers: {
-			"Content-Type": "application/json",
-		},
-	});
-
-	_api.interceptors.request.use(
-		(config) => {
-			if (typeof window !== "undefined") {
-				const token = localStorage.getItem("auth_token");
-				if (token) {
-					config.headers.Authorization = `Bearer ${token}`;
-				}
-			}
-			return config;
-		},
-		(error) => {
-			return Promise.reject(error);
-		},
-	);
-
-	return _api;
-}
+import {useApi, setAuthToken} from "../composables/useApi";
 
 export interface User {
+	id: string;
 	email: string;
+	isVerified: boolean;
 }
 
 export interface AuthResponse {
@@ -40,112 +11,70 @@ export interface AuthResponse {
 	token: string;
 }
 
+export interface LoginRequest {
+	email: string;
+	password: string;
+}
+
+export interface RegisterRequest {
+	email: string;
+	password: string;
+}
+
+export interface VerifyEmailRequest {
+	email: string;
+	pin: string;
+}
+
+export interface RequestPasswordResetRequest {
+	email: string;
+}
+
+export interface ResetPasswordRequest {
+	email: string;
+	pin: string;
+	newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+	currentPassword: string;
+	newPassword: string;
+}
+
 export const authService = {
-	/**
-	 * Đăng ký tài khoản mới
-	 * @param userData - { email, password }
-	 */
-	async register(userData: any): Promise<any> {
-		try {
-			const response = await getApi().post("/auth/register", userData);
-			return response.data;
-		} catch (error) {
-			return this._handleError(error, "Đăng ký thất bại");
-		}
+	async register(payload: RegisterRequest): Promise<{message: string}> {
+		const {data} = await useApi().post("/auth/register", payload);
+		return data;
 	},
 
-	/**
-	 * Xác thực Email bằng mã PIN
-	 * @param data - { email, pin }
-	 */
-	async verifyEmail(data: any): Promise<AuthResponse> {
-		try {
-			const response = await getApi().post<AuthResponse>("/auth/verify-email", data);
-			const responseData = response.data;
-
-			if (typeof window !== "undefined" && responseData.token) {
-				localStorage.setItem("auth_token", responseData.token);
-			}
-
-			return responseData;
-		} catch (error) {
-			return this._handleError(error, "Xác thực mã PIN thất bại");
-		}
+	async verifyEmail(payload: VerifyEmailRequest): Promise<AuthResponse> {
+		const {data} = await useApi().post<AuthResponse>("/auth/verify-email", payload);
+		setAuthToken(data.token);
+		return data;
 	},
 
-	/**
-	 * Đăng nhập
-	 * @param credentials - { email, password }
-	 */
-	async login(credentials: any): Promise<AuthResponse> {
-		try {
-			const response = await getApi().post<AuthResponse>("/auth/login", credentials);
-			const data = response.data;
-
-			if (typeof window !== "undefined" && data.token) {
-				localStorage.setItem("auth_token", data.token);
-			}
-
-			return data;
-		} catch (error) {
-			return this._handleError(error, "Đăng nhập thất bại");
-		}
+	async login(payload: LoginRequest): Promise<AuthResponse> {
+		const {data} = await useApi().post<AuthResponse>("/auth/login", payload);
+		setAuthToken(data.token);
+		return data;
 	},
 
-	/**
-	 * Yêu cầu mã PIN quên mật khẩu
-	 * @param data - { email }
-	 */
-	async requestPasswordReset(data: { email: string }): Promise<any> {
-		try {
-			const response = await getApi().post(
-				"/auth/request-password-reset",
-				data,
-			);
-			return response.data;
-		} catch (error) {
-			return this._handleError(error, "Yêu cầu đặt lại mật khẩu thất bại");
-		}
+	async requestPasswordReset(payload: RequestPasswordResetRequest): Promise<{message: string}> {
+		const {data} = await useApi().post("/auth/request-password-reset", payload);
+		return data;
 	},
 
-	/**
-	 * Đặt lại mật khẩu bằng mã PIN
-	 * @param data - { email, pin, newPassword }
-	 */
-	async resetPassword(data: any): Promise<any> {
-		try {
-			const response = await getApi().post("/auth/reset-password", data);
-			return response.data;
-		} catch (error) {
-			return this._handleError(error, "Đặt lại mật khẩu thất bại");
-		}
+	async resetPassword(payload: ResetPasswordRequest): Promise<{message: string}> {
+		const {data} = await useApi().post("/auth/reset-password", payload);
+		return data;
 	},
 
-	/**
-	 * Đăng xuất
-	 */
+	async changePassword(payload: ChangePasswordRequest): Promise<{message: string}> {
+		const {data} = await useApi().post("/auth/change-password", payload);
+		return data;
+	},
+
 	logout(): void {
-		if (typeof window !== "undefined") {
-			localStorage.removeItem("auth_token");
-		}
-	},
-
-	/**
-	 * Lấy Token hiện tại
-	 */
-	getToken(): string | null {
-		if (typeof window !== "undefined") {
-			return localStorage.getItem("auth_token");
-		}
-		return null;
-	},
-
-	/**
-	 * Hàm xử lý lỗi tập trung
-	 */
-	_handleError(error: any, defaultMessage: string): never {
-		const message = error.response?.data || error.message || defaultMessage;
-		console.error(`AuthService Error: ${message}`, error);
-		throw new Error(message);
+		setAuthToken(null);
 	},
 };

@@ -149,43 +149,7 @@
 						>
 					</div>
 
-					<div class="hero-controls">
-						<button class="icon-btn round-dark">
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="M15 18l-6-6 6-6" />
-							</svg>
-						</button>
-						<button class="icon-btn round-dark">
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="M9 18l6-6-6-6" />
-							</svg>
-						</button>
-					</div>
 				</div>
-			</div>
-
-			<div class="hero-dots">
-				<span class="dot active"></span>
-				<span class="dot"></span>
-				<span class="dot"></span>
 			</div>
 		</section>
 
