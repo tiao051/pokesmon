@@ -8,7 +8,19 @@
 	import type { Product } from '../types/product'
 
 	const router = useRouter()
+	const route = useRoute()
 	const isMobileMenuOpen = ref(false)
+
+	const handleLogoClick = (event: MouseEvent) => {
+	  event.preventDefault()
+	  if (route.path === '/') {
+	    if (import.meta.client) {
+	      window.scrollTo({ top: 0, behavior: 'smooth' })
+	    }
+	    return
+	  }
+	  router.push('/')
+	}
 	const { count } = useCart()
 	const { isLoggedIn, email, avatar, signOut } = useAuth()
 
@@ -102,11 +114,11 @@
 <template>
 	<header class="header">
 		<div class="header-container">
-			<NuxtLink to="/" class="logo-link">
+			<a href="/" class="logo-link" @click="handleLogoClick">
 				<div class="logo">
 					<h1>PokéGogh</h1>
 				</div>
-			</NuxtLink>
+			</a>
 
 			<!-- Middle Search Bar -->
 			<div

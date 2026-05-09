@@ -3,6 +3,7 @@
 	import {productService} from "../services/productService";
 
 	const RAIL_LIMIT = 8;
+	const HOME_CACHE_TTL_MS = 120_000;
 
 	const dayOfYearSeed = () => {
 		const now = new Date();
@@ -10,11 +11,12 @@
 		return Math.floor((now.getTime() - start.getTime()) / 86_400_000);
 	};
 
-	const {
-		data: homeData,
-		pending: homeLoading,
-		error: homeError,
-	} = await useAsyncData("home-rails", async () => {
+	const homeCache = useState("home-rails-cache", () => ({
+		data: null,
+		expiresAt: 0,
+	}));
+
+	const fetchHomeRails = async () => {
 		const categories = await productService.getCategories();
 		const setNames = categories.setNames ?? [];
 		const curatorSet = setNames.length
@@ -33,13 +35,27 @@
 				: Promise.resolve(null),
 		]);
 
-		return {
+		const result = {
 			newest: newest.items,
 			topPriced: topPriced.items,
 			sealed: sealed.items,
 			curator: curator?.items ?? [],
 			curatorSet,
 		};
+		homeCache.value = {data: result, expiresAt: Date.now() + HOME_CACHE_TTL_MS};
+		return result;
+	};
+
+	const {
+		data: homeData,
+		pending: homeLoading,
+		error: homeError,
+	} = await useAsyncData("home-rails", fetchHomeRails, {
+		getCachedData: () => {
+			const c = homeCache.value;
+			if (!c.data || Date.now() > c.expiresAt) return undefined;
+			return c.data;
+		},
 	});
 
 	const newestProducts = computed(() => homeData.value?.newest ?? []);

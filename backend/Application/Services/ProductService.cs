@@ -24,6 +24,7 @@ public class ProductService
 {
     private const string CategoriesCacheKey = "products:categories";
     private static readonly TimeSpan CategoriesCacheTtl = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan ListCacheTtl = TimeSpan.FromSeconds(60);
 
     private readonly MongoDbContext _context;
     private readonly IMemoryCache _cache;
@@ -36,6 +37,10 @@ public class ProductService
 
     public async Task<ProductListResponse> ListAsync(ProductListQuery q, CancellationToken ct = default)
     {
+        var cacheKey = BuildListCacheKey(q);
+        if (_cache.TryGetValue(cacheKey, out ProductListResponse? cached) && cached is not null)
+            return cached;
+
         var filter = BuildFilter(q);
         var sort = q.Sort switch
         {
@@ -52,8 +57,13 @@ public class ProductService
             .ToListAsync(ct);
 
         var items = products.Select(p => MapToResponse(p, includeBase64: false)).ToList();
-        return new ProductListResponse(items, total, q.Page, q.Limit);
+        var result = new ProductListResponse(items, total, q.Page, q.Limit);
+        _cache.Set(cacheKey, result, ListCacheTtl);
+        return result;
     }
+
+    private static string BuildListCacheKey(ProductListQuery q) =>
+        $"products:list:{q.ProductType}:{q.SetName}:{q.Search}:{q.MaxPrice}:{q.Sealed}:{q.Sort}:{q.Page}:{q.Limit}";
 
     public async Task<ProductDetailResponse?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
