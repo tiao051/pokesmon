@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PinService>();
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
+        services.AddScoped<OrderService>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         return services;

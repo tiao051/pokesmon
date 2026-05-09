@@ -151,6 +151,10 @@ const handleSignOut = () => {
             <span class="nav-glyph" aria-hidden="true"></span>
             <span class="nav-label">Profile</span>
           </NuxtLink>
+          <NuxtLink to="/account/orders" class="nav-item" active-class="active">
+            <span class="nav-glyph" aria-hidden="true"></span>
+            <span class="nav-label">My Orders</span>
+          </NuxtLink>
           <NuxtLink to="/account/change-password" class="nav-item" active-class="active">
             <span class="nav-glyph" aria-hidden="true"></span>
             <span class="nav-label">Security</span>

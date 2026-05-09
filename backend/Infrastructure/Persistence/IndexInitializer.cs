@@ -32,6 +32,14 @@ public static class IndexInitializer
                 new CreateIndexOptions { Name = "ix_products_created" }),
         }, cancellationToken: ct);
 
+        await ctx.Orders.Indexes.CreateOneAsync(
+            new CreateIndexModel<Order>(
+                Builders<Order>.IndexKeys
+                    .Ascending(o => o.UserEmail)
+                    .Descending(o => o.CreatedAt),
+                new CreateIndexOptions { Name = "ix_orders_user_created" }),
+            cancellationToken: ct);
+
         var ttl = TimeSpan.FromMinutes(Constants.OtpExpiryMinutes + 5);
         foreach (var collection in new[] { ctx.RegistrationPins, ctx.ResetPasswordPins })
         {
