@@ -60,6 +60,13 @@
 	const handleSignOut = () => {
 	  signOut()
 	  closeMenu()
+	  dismissUserMenu()
+	}
+
+	const dismissUserMenu = () => {
+	  if (import.meta.client && document.activeElement instanceof HTMLElement) {
+	    document.activeElement.blur()
+	  }
 	}
 
 	const executeSearch = (term: string | Event) => {
@@ -262,6 +269,7 @@
 							to="/account"
 							class="user-dropdown-item"
 							role="menuitem"
+							@click="dismissUserMenu"
 							>My Profile</NuxtLink
 						>
 						<button
