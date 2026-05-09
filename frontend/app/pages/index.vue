@@ -11,58 +11,79 @@
 		return Math.floor((now.getTime() - start.getTime()) / 86_400_000);
 	};
 
-	const homeCache = useState("home-rails-cache", () => ({
-		data: null,
-		expiresAt: 0,
-	}));
-
-	const fetchHomeRails = async () => {
-		const categories = await productService.getCategories();
-		const setNames = categories.setNames ?? [];
-		const curatorSet = setNames.length
-			? setNames[dayOfYearSeed() % setNames.length]
-			: null;
-
-		const [newest, topPriced, sealed, curator] = await Promise.all([
-			productService.getProducts({limit: RAIL_LIMIT, sort: "newest"}),
-			productService.getProducts({limit: RAIL_LIMIT}),
-			productService.getProducts({limit: RAIL_LIMIT, sealed: true}),
-			curatorSet
-				? productService.getProducts({
-					limit: RAIL_LIMIT,
-					setName: curatorSet,
-				})
-				: Promise.resolve(null),
-		]);
-
-		const result = {
-			newest: newest.items,
-			topPriced: topPriced.items,
-			sealed: sealed.items,
-			curator: curator?.items ?? [],
-			curatorSet,
-		};
-		homeCache.value = {data: result, expiresAt: Date.now() + HOME_CACHE_TTL_MS};
-		return result;
+	const useLazyRail = (key, fetcher) => {
+		const cache = useState(`home-rail-${key}`, () => ({
+			data: null,
+			expiresAt: 0,
+		}));
+		return useAsyncData(
+			`home-${key}`,
+			async () => {
+				const data = await fetcher();
+				cache.value = {
+					data,
+					expiresAt: Date.now() + HOME_CACHE_TTL_MS,
+				};
+				return data;
+			},
+			{
+				lazy: true,
+				getCachedData: () => {
+					const c = cache.value;
+					if (!c.data || Date.now() > c.expiresAt) return undefined;
+					return c.data;
+				},
+			},
+		);
 	};
 
 	const {
-		data: homeData,
-		pending: homeLoading,
-		error: homeError,
-	} = await useAsyncData("home-rails", fetchHomeRails, {
-		getCachedData: () => {
-			const c = homeCache.value;
-			if (!c.data || Date.now() > c.expiresAt) return undefined;
-			return c.data;
-		},
+		data: newestData,
+		pending: newestPending,
+		error: newestError,
+	} = useLazyRail("newest", () =>
+		productService.getProducts({limit: RAIL_LIMIT, sort: "newest"}),
+	);
+
+	const {
+		data: topPricedData,
+		pending: topPricedPending,
+		error: topPricedError,
+	} = useLazyRail("top-priced", () =>
+		productService.getProducts({limit: RAIL_LIMIT}),
+	);
+
+	const {
+		data: sealedData,
+		pending: sealedPending,
+		error: sealedError,
+	} = useLazyRail("sealed", () =>
+		productService.getProducts({limit: RAIL_LIMIT, sealed: true}),
+	);
+
+	const {
+		data: curatorData,
+		pending: curatorPending,
+		error: curatorError,
+	} = useLazyRail("curator", async () => {
+		const categories = await productService.getCategories();
+		const setNames = categories.setNames ?? [];
+		const set = setNames.length
+			? setNames[dayOfYearSeed() % setNames.length]
+			: null;
+		if (!set) return {items: [], curatorSet: null};
+		const result = await productService.getProducts({
+			limit: RAIL_LIMIT,
+			setName: set,
+		});
+		return {items: result.items, curatorSet: set};
 	});
 
-	const newestProducts = computed(() => homeData.value?.newest ?? []);
-	const topPricedProducts = computed(() => homeData.value?.topPriced ?? []);
-	const sealedProducts = computed(() => homeData.value?.sealed ?? []);
-	const curatorProducts = computed(() => homeData.value?.curator ?? []);
-	const curatorSet = computed(() => homeData.value?.curatorSet ?? null);
+	const newestProducts = computed(() => newestData.value?.items ?? []);
+	const topPricedProducts = computed(() => topPricedData.value?.items ?? []);
+	const sealedProducts = computed(() => sealedData.value?.items ?? []);
+	const curatorProducts = computed(() => curatorData.value?.items ?? []);
+	const curatorSet = computed(() => curatorData.value?.curatorSet ?? null);
 
 	useHead({
 		link: [
@@ -250,39 +271,47 @@
 			<h3 class="section-title">Featured from the Collection</h3>
 
 			<ProductRail
+				theme="display"
+				eyebrow="Wing 01 · Recently Acquired"
 				title="Now on Display"
 				subtitle="Latest acquisitions, freshly curated"
 				:products="newestProducts"
-				:pending="homeLoading"
-				:error="homeError"
+				:pending="newestPending"
+				:error="newestError"
 			/>
 
 			<ProductRail
+				theme="master"
+				eyebrow="Wing 02 · Premier Selection"
 				title="Master Collection"
 				subtitle="The gallery's most prized pieces"
 				:products="topPricedProducts"
-				:pending="homeLoading"
-				:error="homeError"
+				:pending="topPricedPending"
+				:error="topPricedError"
 				view-all-link="/products"
 			/>
 
 			<ProductRail
+				theme="vault"
+				eyebrow="Wing 03 · Sealed Archive"
 				title="Vault Treasures"
 				subtitle="Sealed and untouched, just as they arrived"
 				:products="sealedProducts"
-				:pending="homeLoading"
-				:error="homeError"
+				:pending="sealedPending"
+				:error="sealedError"
 				view-all-link="/products?sealed=true"
 			/>
 
 			<ProductRail
-				v-if="curatorSet"
+				v-if="curatorPending || curatorSet"
+				theme="curator"
+				eyebrow="Wing 04 · Daily Curation"
 				title="Curator's Eye"
-				:subtitle="`A daily look into the ${curatorSet} expansion`"
+				:subtitle="curatorSet ? `A daily look into the ${curatorSet} expansion` : 'A daily look into our curated expansions'"
 				:products="curatorProducts"
-				:pending="homeLoading"
-				:error="homeError"
-				:view-all-link="`/products?setName=${encodeURIComponent(curatorSet)}`"
+				:pending="curatorPending"
+				:error="curatorError"
+				:view-all-link="curatorSet ? `/products?setName=${encodeURIComponent(curatorSet)}` : undefined"
 			/>
 
 			<div class="load-more-container">

@@ -9,6 +9,8 @@ const props = defineProps<{
 	pending?: boolean;
 	error?: unknown;
 	viewAllLink?: string;
+	theme?: "display" | "master" | "vault" | "curator";
+	eyebrow?: string;
 }>();
 
 const visibleCount = ref(4);
@@ -63,9 +65,10 @@ const next = () => {
 </script>
 
 <template>
-	<section class="rail">
+	<section class="rail" :class="theme ? `rail--${theme}` : ''">
 		<header class="rail-header">
 			<div class="rail-heading-block">
+				<span v-if="eyebrow" class="rail-eyebrow">{{ eyebrow }}</span>
 				<h3 class="rail-title">{{ title }}</h3>
 				<p v-if="subtitle" class="rail-subtitle">{{ subtitle }}</p>
 			</div>
@@ -155,6 +158,140 @@ const next = () => {
 <style scoped>
 .rail {
 	margin-bottom: 4rem;
+}
+
+/* ── Themed rails: each one a museum wing ────────────────── */
+.rail--display,
+.rail--master,
+.rail--vault,
+.rail--curator {
+	position: relative;
+	padding: 2.5rem 2rem 2rem;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.rail--display::before,
+.rail--master::before,
+.rail--vault::before,
+.rail--curator::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 2rem;
+	right: 2rem;
+	height: 2px;
+	pointer-events: none;
+}
+
+.rail--display {
+	background: linear-gradient(
+		180deg,
+		rgba(255, 197, 18, 0.07) 0%,
+		rgba(255, 197, 18, 0.01) 70%
+	);
+}
+
+.rail--display::before {
+	background: linear-gradient(
+		90deg,
+		transparent,
+		var(--color-sunflower-yellow),
+		transparent
+	);
+}
+
+.rail--master {
+	background: linear-gradient(
+		180deg,
+		rgba(0, 49, 83, 0.05) 0%,
+		rgba(0, 49, 83, 0.01) 70%
+	);
+}
+
+.rail--master::before {
+	background: linear-gradient(
+		90deg,
+		transparent,
+		#c2821b,
+		transparent
+	);
+}
+
+.rail--vault {
+	background: linear-gradient(
+		180deg,
+		rgba(15, 94, 60, 0.06) 0%,
+		rgba(15, 94, 60, 0.01) 70%
+	);
+}
+
+.rail--vault::before {
+	background: linear-gradient(
+		90deg,
+		transparent,
+		var(--color-cypress-green),
+		transparent
+	);
+}
+
+.rail--curator {
+	background: linear-gradient(
+		180deg,
+		rgba(194, 130, 27, 0.07) 0%,
+		rgba(194, 130, 27, 0.01) 70%
+	);
+}
+
+.rail--curator::before {
+	height: 1px;
+	background-image: linear-gradient(
+		90deg,
+		#c2821b 50%,
+		transparent 50%
+	);
+	background-size: 8px 1px;
+	background-repeat: repeat-x;
+}
+
+.rail-eyebrow {
+	display: block;
+	font-family: var(--font-serif);
+	font-style: italic;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	margin-bottom: 0.4rem;
+	color: #c2821b;
+}
+
+.rail--master .rail-eyebrow {
+	color: var(--color-prussian-blue);
+}
+
+.rail--vault .rail-eyebrow {
+	color: var(--color-cypress-green);
+}
+
+.rail--curator .rail-eyebrow {
+	color: #8b5a2b;
+}
+
+@media (max-width: 768px) {
+	.rail--display,
+	.rail--master,
+	.rail--vault,
+	.rail--curator {
+		padding: 2rem 1.25rem 1.5rem;
+	}
+
+	.rail--display::before,
+	.rail--master::before,
+	.rail--vault::before,
+	.rail--curator::before {
+		left: 1.25rem;
+		right: 1.25rem;
+	}
 }
 
 .rail-header {
