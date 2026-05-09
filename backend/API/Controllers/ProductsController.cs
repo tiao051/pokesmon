@@ -33,6 +33,7 @@ public class ProductsController : ControllerBase
         [FromQuery] string? productType = null,
         [FromQuery] string? setName = null,
         [FromQuery] string? search = null,
+        [FromQuery] decimal? maxPrice = null,
         [FromQuery] int page = 1,
         [FromQuery] int limit = 20)
     {
@@ -52,6 +53,9 @@ public class ProductsController : ControllerBase
                 Builders<Product>.Filter.Regex(p => p.SetName, pattern),
                 Builders<Product>.Filter.Regex(p => p.ProductTypeName, pattern));
         }
+
+        if (maxPrice.HasValue)
+            filter &= Builders<Product>.Filter.Lte(p => p.MarketPrice, maxPrice.Value);
 
         var total = await _context.Products.CountDocumentsAsync(filter);
 

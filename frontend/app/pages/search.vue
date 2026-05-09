@@ -1,18 +1,35 @@
 <script setup lang="ts">
-	import { ref, computed, watch } from 'vue'
+	import { ref, computed, watch, onBeforeUnmount } from 'vue'
 	import { useRoute } from 'vue-router'
 	import { productService } from '../services/productService'
+
+	const PRICE_MAX = 500
+	const PRICE_COMMIT_DEBOUNCE_MS = 300
+	const itemsPerPage = 8
 
 	const route = useRoute()
 	const query = computed(() => route.query.q?.toString() || '')
 
 	const selectedCategory = ref('')
-	const maxPrice = ref(500)
+
+	const maxPrice = ref(PRICE_MAX)
+	const appliedMaxPrice = ref(PRICE_MAX)
+	const isDraggingPrice = ref(false)
+
+	let priceCommitTimer: ReturnType<typeof setTimeout> | null = null
+	const commitMaxPrice = () => {
+	  if (priceCommitTimer) clearTimeout(priceCommitTimer)
+	  priceCommitTimer = setTimeout(() => {
+	    appliedMaxPrice.value = maxPrice.value
+	  }, PRICE_COMMIT_DEBOUNCE_MS)
+	}
+	onBeforeUnmount(() => {
+	  if (priceCommitTimer) clearTimeout(priceCommitTimer)
+	})
 
 	const currentPage = ref(1)
-	const itemsPerPage = 8
 
-	watch([query, selectedCategory, maxPrice], () => {
+	watch([query, selectedCategory, appliedMaxPrice], () => {
 	  currentPage.value = 1
 	})
 
@@ -31,6 +48,7 @@
 	const searchParams = computed(() => ({
 	  search: query.value || undefined,
 	  productType: selectedCategory.value || undefined,
+	  maxPrice: appliedMaxPrice.value < PRICE_MAX ? appliedMaxPrice.value : undefined,
 	  limit: itemsPerPage,
 	  page: currentPage.value,
 	}))
@@ -122,21 +140,26 @@
 					</div>
 
 					<div class="filter-group">
-						<h3>
+						<h3 :class="{ 'is-pending': isDraggingPrice }">
 							Max Price:
 							<span class="price-val">${{ maxPrice }}</span>
+							<span v-if="isDraggingPrice" class="price-hint">Release to apply</span>
 						</h3>
 						<input
 							type="range"
 							min="0"
-							max="500"
+							:max="PRICE_MAX"
 							step="10"
 							v-model.number="maxPrice"
 							class="price-slider"
+							@pointerdown="isDraggingPrice = true"
+							@pointerup="isDraggingPrice = false"
+							@pointercancel="isDraggingPrice = false"
+							@change="commitMaxPrice"
 						/>
 						<div class="price-labels">
 							<span>$0</span>
-							<span>$500</span>
+							<span>${{ PRICE_MAX }}</span>
 						</div>
 					</div>
 				</div>
@@ -175,6 +198,8 @@
 				<div
 					v-else-if="filteredProducts.length > 0"
 					class="product-grid"
+					:class="{ 'is-refetching': searchLoading }"
+					:aria-busy="searchLoading"
 				>
 					<ProductCard
 						v-for="product in filteredProducts"
@@ -343,12 +368,32 @@
 	.price-val {
 		color: var(--color-cypress-green);
 		font-weight: 600;
+		transition: opacity 0.15s ease;
+	}
+
+	.filter-group h3.is-pending .price-val {
+		opacity: 0.5;
+	}
+
+	.price-hint {
+		margin-left: 0.5rem;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 400;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: #999;
 	}
 
 	.price-slider {
 		width: 100%;
-		accent-color: var(--color-cypress-green);
+		accent-color: var(--color-prussian-blue);
 		margin-bottom: 0.5rem;
+		transition: accent-color 0.15s ease;
+	}
+
+	.price-slider:active {
+		accent-color: var(--color-cypress-green);
 	}
 
 	.price-labels {
@@ -374,6 +419,12 @@
 		display: grid;
 		grid-template-columns: repeat(1, 1fr);
 		gap: 2rem;
+		transition: opacity 0.2s ease;
+	}
+
+	.product-grid.is-refetching {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 
 	@media (min-width: 500px) {
