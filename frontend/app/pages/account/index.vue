@@ -251,8 +251,9 @@ const handleSignOut = () => {
           <NuxtImg
             src="/images/list_pokemon.png"
             alt=""
-            width="600"
-            height="400"
+            width="669"
+            height="373"
+            sizes="xs:100vw md:50vw"
             loading="lazy"
             decoding="async"
           />
