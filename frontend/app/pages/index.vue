@@ -48,6 +48,18 @@
 	const curatorProducts = computed(() => homeData.value?.curator ?? []);
 	const curatorSet = computed(() => homeData.value?.curatorSet ?? null);
 
+	useHead({
+		link: [
+			{
+				rel: "preload",
+				as: "image",
+				href: "/images/pikachu_vangogh.webp",
+				type: "image/webp",
+				fetchpriority: "high",
+			},
+		],
+	});
+
 	const newsItems = ref([
 		{
 			id: 1,
@@ -106,6 +118,11 @@
 				src="/images/pikachu_vangogh.webp"
 				alt="Starry Pikachu"
 				class="hero-bg full-width"
+				width="1920"
+				height="1080"
+				fetchpriority="high"
+				loading="eager"
+				decoding="async"
 			/>
 			<div class="hero-overlay"></div>
 
@@ -176,9 +193,33 @@
 		<section class="whats-new-section">
 			<div class="whats-new-belt" aria-hidden="true">
 				<span class="line"></span>
-				<img src="/images/red_pokeball.jpg" alt="" class="bp" />
-				<img src="/images/blue_pokeball.jpg" alt="" class="bp" />
-				<img src="/images/black_pokeball.jpg" alt="" class="bp" />
+				<NuxtImg
+					src="/images/red_pokeball.jpg"
+					alt=""
+					class="bp"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
+				/>
+				<NuxtImg
+					src="/images/blue_pokeball.jpg"
+					alt=""
+					class="bp"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
+				/>
+				<NuxtImg
+					src="/images/black_pokeball.jpg"
+					alt=""
+					class="bp"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
+				/>
 				<span class="line"></span>
 			</div>
 			<h2 class="whats-new-text">What's new?</h2>
@@ -217,10 +258,14 @@
 
 		<!-- Shop Section -->
 		<section class="shop-section">
-			<img
+			<NuxtImg
 				src="/images/big_pokeball.jpg"
 				alt=""
 				class="shop-pokeball-stamp"
+				width="56"
+				height="56"
+				loading="lazy"
+				decoding="async"
 			/>
 			<h3 class="section-title">Featured from the Collection</h3>
 

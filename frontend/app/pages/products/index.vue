@@ -91,10 +91,14 @@
 <template>
 	<main class="collection-page">
 		<header class="page-header">
-			<img
+			<NuxtImg
 				src="/images/big_pokeball.jpg"
 				alt=""
 				class="header-pokeball"
+				width="56"
+				height="56"
+				loading="eager"
+				decoding="async"
 			/>
 			<span class="eyebrow gold-italic">PokéGogh Museum Catalog</span>
 			<h1 class="page-title">The Collection</h1>
@@ -103,20 +107,32 @@
 				post-impressionist Pokémon artifacts.
 			</p>
 			<div class="header-trainer-belt" aria-hidden="true">
-				<img
+				<NuxtImg
 					src="/images/red_pokeball.jpg"
 					alt=""
 					class="belt-pokeball"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
 				/>
-				<img
+				<NuxtImg
 					src="/images/blue_pokeball.jpg"
 					alt=""
 					class="belt-pokeball"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
 				/>
-				<img
+				<NuxtImg
 					src="/images/black_pokeball.jpg"
 					alt=""
 					class="belt-pokeball"
+					width="22"
+					height="22"
+					loading="lazy"
+					decoding="async"
 				/>
 			</div>
 		</header>

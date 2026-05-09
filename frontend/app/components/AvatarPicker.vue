@@ -84,7 +84,14 @@ onUnmounted(() => {
                   :aria-pressed="selected === opt.src"
                   @click="selected = opt.src"
                 >
-                  <img :src="opt.src" :alt="opt.label" />
+                  <NuxtImg
+                  :src="opt.src"
+                  :alt="opt.label"
+                  width="96"
+                  height="96"
+                  loading="lazy"
+                  decoding="async"
+                />
                   <span class="picker-check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="20 6 9 17 4 12"></polyline>
@@ -107,7 +114,14 @@ onUnmounted(() => {
                   :aria-pressed="selected === opt.src"
                   @click="selected = opt.src"
                 >
-                  <img :src="opt.src" :alt="opt.label" />
+                  <NuxtImg
+                  :src="opt.src"
+                  :alt="opt.label"
+                  width="96"
+                  height="96"
+                  loading="lazy"
+                  decoding="async"
+                />
                   <span class="picker-check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="20 6 9 17 4 12"></polyline>

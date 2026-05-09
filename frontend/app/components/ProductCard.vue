@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { formatPrice } from '../types/product'
 
 const props = defineProps({
@@ -11,11 +11,6 @@ const props = defineProps({
 
 const { add } = useCart()
 const toast = useToast()
-
-const isLoaded = ref(false)
-const onLoad = () => {
-  isLoaded.value = true
-}
 
 const handleAdd = () => {
   const result = add(props.product, 1)
@@ -33,36 +28,42 @@ const handleAdd = () => {
 const imageSrc = computed(() => {
   if (props.product.imageBase64) {
     const base64 = props.product.imageBase64
-    if (base64.startsWith('data:')) return base64
-    return `data:image/png;base64,${base64}`
+    return base64.startsWith('data:') ? base64 : `data:image/png;base64,${base64}`
   }
-  return props.product.image || '/images/loading_gif.gif'
+  return props.product.image || ''
 })
+
+const isDataUrl = computed(() => imageSrc.value.startsWith('data:'))
 </script>
 
 <template>
   <NuxtLink :to="`/products/${product.slug}`" class="product-card-link">
     <article class="product-card">
       <div class="product-image-container">
-        <!-- Main Image -->
-        <img 
-          :src="imageSrc" 
-          :alt="product.title" 
-          class="product-image" 
-          :class="{ 'is-hidden': !isLoaded }"
-          @load="onLoad"
-          @error="onLoad"
-          loading="lazy" 
+        <!-- Data URL fallback (rare; list responses no longer carry base64) -->
+        <img
+          v-if="isDataUrl"
+          :src="imageSrc"
+          :alt="product.title"
+          class="product-image"
+          width="400"
+          height="500"
+          loading="lazy"
+          decoding="async"
         />
-        
-        <!-- Loading Placeholder -->
-        <div v-if="!isLoaded" class="loading-overlay">
-          <img 
-            src="/images/loading_gif.gif" 
-            alt="Loading..." 
-            class="loading-gif" 
-          />
-        </div>
+        <!-- Optimised image via @nuxt/image -->
+        <NuxtImg
+          v-else-if="imageSrc"
+          :src="imageSrc"
+          :alt="product.title"
+          class="product-image"
+          width="400"
+          height="500"
+          sizes="xs:50vw sm:50vw md:33vw lg:25vw xl:25vw"
+          loading="lazy"
+          decoding="async"
+          placeholder
+        />
 
         <button
           class="add-to-cart-quick"
@@ -103,27 +104,5 @@ const imageSrc = computed(() => {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
-}
-
-.product-image.is-hidden {
-  opacity: 0;
-  position: absolute;
-}
-
-.loading-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-linen);
-  z-index: 1;
-}
-
-.loading-gif {
-  width: 50%;
-  height: auto;
-  object-fit: contain;
 }
 </style>

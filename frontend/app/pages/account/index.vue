@@ -106,10 +106,14 @@ const handleSignOut = () => {
 
         <div class="avatar-frame">
           <div class="avatar-glow" aria-hidden="true"></div>
-          <img
+          <NuxtImg
             :src="currentAvatar"
             alt="Trainer avatar"
             class="avatar-img"
+            width="120"
+            height="120"
+            loading="eager"
+            decoding="async"
           />
           <button
             type="button"
@@ -244,7 +248,14 @@ const handleSignOut = () => {
         </dl>
 
         <figure v-if="!editing" class="details-figure" aria-hidden="true">
-          <img src="/images/list_pokemon.png" alt="" />
+          <NuxtImg
+            src="/images/list_pokemon.png"
+            alt=""
+            width="600"
+            height="400"
+            loading="lazy"
+            decoding="async"
+          />
         </figure>
       </article>
     </div>

@@ -70,20 +70,27 @@
 		title: product.value ? `${product.value.title} — PokéGogh` : "PokéGogh",
 	}));
 
-	const isDetailLoaded = ref(false);
-	const onDetailLoad = () => {
-		isDetailLoaded.value = true;
-	};
-
 	const actualImageSrc = computed(() => {
 		if (product.value?.imageBase64) {
-			if (product.value.imageBase64.startsWith("data:")) {
-				return product.value.imageBase64;
-			}
-			return `data:image/png;base64,${product.value.imageBase64}`;
+			const base64 = product.value.imageBase64;
+			return base64.startsWith("data:")
+				? base64
+				: `data:image/png;base64,${base64}`;
 		}
-		return product.value?.image || "/images/loading_gif.gif";
+		return product.value?.image || "";
 	});
+
+	const isActualDataUrl = computed(() =>
+		actualImageSrc.value.startsWith("data:"),
+	);
+
+	const displayImageSrc = computed(() =>
+		showRealImage.value ? actualImageSrc.value : placeholderImage,
+	);
+
+	const isDisplayDataUrl = computed(() =>
+		displayImageSrc.value.startsWith("data:"),
+	);
 </script>
 
 <template>
@@ -141,23 +148,40 @@
 						"
 						@click="toggleImage"
 					>
-						<img src="/images/big_pokeball.jpg" alt="" />
+						<NuxtImg
+							src="/images/big_pokeball.jpg"
+							alt=""
+							width="48"
+							height="48"
+							loading="lazy"
+							decoding="async"
+						/>
 					</button>
 
-					<!-- Main Image -->
+					<!-- Main Image (data URL fallback when imageBase64 carried inline) -->
 					<img
-						:src="showRealImage ? actualImageSrc : placeholderImage"
+						v-if="isDisplayDataUrl"
+						:src="displayImageSrc"
 						:alt="product.title"
 						class="detail-main-img"
-						:class="{ 'is-hidden': !isDetailLoaded }"
-						@load="onDetailLoad"
-						@error="onDetailLoad"
+						width="800"
+						height="1000"
+						decoding="async"
 					/>
-
-					<!-- Loading Placeholder -->
-					<div v-if="!isDetailLoaded" class="detail-loading-overlay">
-						<img src="/images/loading_gif.gif" alt="Loading..." class="loading-gif" />
-					</div>
+					<NuxtImg
+						v-else
+						:src="displayImageSrc"
+						:alt="product.title"
+						class="detail-main-img"
+						width="800"
+						height="1000"
+						sizes="xs:100vw sm:90vw md:50vw lg:40vw xl:40vw"
+						quality="85"
+						fetchpriority="high"
+						loading="eager"
+						decoding="async"
+						placeholder
+					/>
 				</div>
 			</div>
 
@@ -306,27 +330,6 @@
 		object-fit: cover;
 		position: relative;
 		z-index: 1;
-		transition: opacity 0.3s ease;
-	}
-
-	.detail-main-img.is-hidden {
-		opacity: 0;
-		position: absolute;
-	}
-
-	.detail-loading-overlay {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: #e8e5d8;
-		z-index: 2;
-	}
-
-	.detail-loading-overlay .loading-gif {
-		width: 30%;
-		height: auto;
 	}
 
 	.detail-image-frame::after {
