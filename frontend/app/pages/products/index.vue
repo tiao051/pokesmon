@@ -107,14 +107,14 @@
 			<!-- Loading skeleton -->
 			<template v-if="catsLoading">
 				<div class="filter-left">
-					<div class="select-skeleton"></div>
-					<div class="select-skeleton"></div>
+					<div class="skeleton select-skeleton"></div>
+					<div class="skeleton select-skeleton"></div>
 				</div>
-				<div class="count-skeleton"></div>
+				<div class="skeleton count-skeleton"></div>
 			</template>
 
 			<!-- Error fallback -->
-			<p v-else-if="catsError" class="categories-error">
+			<p v-else-if="catsError" class="inline-error">
 				Unable to load exhibition wings. Showing all artifacts.
 			</p>
 
@@ -171,7 +171,7 @@
 			<div v-for="n in 8" :key="n" class="skeleton skeleton-card"></div>
 		</div>
 
-		<p v-else-if="productsError" class="categories-error">
+		<p v-else-if="productsError" class="inline-error">
 			Unable to load the collection. Please try again.
 		</p>
 
@@ -343,35 +343,17 @@
 			2px 2px 0 rgba(0, 49, 83, 0.2);
 	}
 
-	/* Skeleton loading for selects */
+	/* Skeleton loading for selects (shimmer comes from global .skeleton) */
 	.select-skeleton {
 		width: 220px;
 		height: 60px;
 		border-radius: 8px;
-		background: linear-gradient(
-			90deg,
-			#e8e5d8 25%,
-			#ddd9c8 50%,
-			#e8e5d8 75%
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.5s infinite;
-		border: 1px solid rgba(0, 49, 83, 0.08);
 	}
 
 	.count-skeleton {
 		width: 70px;
 		height: 52px;
 		border-radius: 8px;
-		background: linear-gradient(
-			90deg,
-			#e8e5d8 25%,
-			#ddd9c8 50%,
-			#e8e5d8 75%
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.5s infinite;
-		border: 1px solid rgba(0, 49, 83, 0.08);
 	}
 
 	.eyebrow.gold-italic {
@@ -410,15 +392,6 @@
 		margin: 0 auto;
 		font-size: 1rem;
 		line-height: 1.6;
-	}
-
-	.categories-error {
-		font-family: var(--font-serif);
-		font-style: italic;
-		color: #c2821b;
-		font-size: 0.95rem;
-		text-align: center;
-		width: 100%;
 	}
 
 </style>

@@ -126,7 +126,7 @@ const emptyMessage = computed(() => {
 				<div v-for="n in 3" :key="n" class="skeleton order-skeleton" />
 			</div>
 
-			<p v-else-if="error" class="orders-error">
+			<p v-else-if="error" class="inline-error">
 				Could not load your orders. Please try again.
 			</p>
 
@@ -278,14 +278,6 @@ const emptyMessage = computed(() => {
 .order-skeleton {
 	height: 280px;
 	border-radius: 12px;
-}
-
-.orders-error {
-	font-family: var(--font-serif);
-	font-style: italic;
-	color: #c2821b;
-	text-align: center;
-	padding: 2rem 0;
 }
 
 .orders-empty {

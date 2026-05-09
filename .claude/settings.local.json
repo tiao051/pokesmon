@@ -19,7 +19,9 @@
       "Bash(cd *)",
       "Bash(timeout *)",
       "Bash(true *)",
-      "Bash(:)"
+      "Bash(:)",
+      "Bash(Get-ChildItem -Path \"D:\\\\pet-project\\\\pokemon\\\\frontend\\\\app\" -Recurse -Force)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

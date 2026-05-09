@@ -127,7 +127,7 @@ const next = () => {
 				class="rail-track is-static"
 				aria-busy="true"
 			>
-				<div v-for="n in 4" :key="n" class="rail-item rail-skeleton" />
+				<div v-for="n in 4" :key="n" class="rail-item skeleton skeleton-card" />
 			</div>
 
 			<p v-else-if="error" class="rail-state-msg rail-error">
@@ -166,9 +166,14 @@ const next = () => {
 .rail--vault,
 .rail--curator {
 	position: relative;
-	padding: 2.5rem 2rem 2rem;
-	border-radius: 16px;
+	padding: 2.75rem 2rem 2.25rem;
+	border-radius: 18px;
 	overflow: hidden;
+	border: 1px solid rgba(0, 49, 83, 0.08);
+	box-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.6) inset,
+		0 12px 32px -20px rgba(0, 49, 83, 0.35),
+		0 2px 6px -4px rgba(0, 49, 83, 0.12);
 }
 
 .rail--display::before,
@@ -178,80 +183,111 @@ const next = () => {
 	content: "";
 	position: absolute;
 	top: 0;
-	left: 2rem;
-	right: 2rem;
-	height: 2px;
+	left: 1.5rem;
+	right: 1.5rem;
+	height: 3px;
+	border-radius: 0 0 3px 3px;
+	pointer-events: none;
+}
+
+.rail--display::after,
+.rail--master::after,
+.rail--vault::after,
+.rail--curator::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 30%;
+	right: 30%;
+	height: 1px;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(0, 49, 83, 0.18),
+		transparent
+	);
 	pointer-events: none;
 }
 
 .rail--display {
 	background: linear-gradient(
 		180deg,
-		rgba(255, 197, 18, 0.07) 0%,
-		rgba(255, 197, 18, 0.01) 70%
+		rgba(255, 197, 18, 0.12) 0%,
+		rgba(255, 197, 18, 0.02) 75%
 	);
+	border-color: rgba(194, 130, 27, 0.18);
 }
 
 .rail--display::before {
 	background: linear-gradient(
 		90deg,
 		transparent,
-		var(--color-sunflower-yellow),
+		var(--color-sunflower-yellow) 30%,
+		var(--color-sunflower-yellow) 70%,
 		transparent
 	);
+	box-shadow: 0 0 12px rgba(255, 197, 18, 0.45);
 }
 
 .rail--master {
 	background: linear-gradient(
 		180deg,
-		rgba(0, 49, 83, 0.05) 0%,
-		rgba(0, 49, 83, 0.01) 70%
+		rgba(0, 49, 83, 0.09) 0%,
+		rgba(0, 49, 83, 0.015) 75%
 	);
+	border-color: rgba(0, 49, 83, 0.14);
 }
 
 .rail--master::before {
 	background: linear-gradient(
 		90deg,
 		transparent,
-		#c2821b,
+		#c2821b 30%,
+		#c2821b 70%,
 		transparent
 	);
+	box-shadow: 0 0 12px rgba(194, 130, 27, 0.4);
 }
 
 .rail--vault {
 	background: linear-gradient(
 		180deg,
-		rgba(15, 94, 60, 0.06) 0%,
-		rgba(15, 94, 60, 0.01) 70%
+		rgba(15, 94, 60, 0.1) 0%,
+		rgba(15, 94, 60, 0.015) 75%
 	);
+	border-color: rgba(15, 94, 60, 0.18);
 }
 
 .rail--vault::before {
 	background: linear-gradient(
 		90deg,
 		transparent,
-		var(--color-cypress-green),
+		var(--color-cypress-green) 30%,
+		var(--color-cypress-green) 70%,
 		transparent
 	);
+	box-shadow: 0 0 12px rgba(15, 94, 60, 0.35);
 }
 
 .rail--curator {
 	background: linear-gradient(
 		180deg,
-		rgba(194, 130, 27, 0.07) 0%,
-		rgba(194, 130, 27, 0.01) 70%
+		rgba(194, 130, 27, 0.12) 0%,
+		rgba(194, 130, 27, 0.02) 75%
 	);
+	border-color: rgba(139, 90, 43, 0.22);
 }
 
 .rail--curator::before {
-	height: 1px;
+	height: 2px;
 	background-image: linear-gradient(
 		90deg,
 		#c2821b 50%,
 		transparent 50%
 	);
-	background-size: 8px 1px;
+	background-size: 10px 2px;
 	background-repeat: repeat-x;
+	box-shadow: 0 0 10px rgba(194, 130, 27, 0.35);
 }
 
 .rail-eyebrow {
@@ -282,15 +318,15 @@ const next = () => {
 	.rail--master,
 	.rail--vault,
 	.rail--curator {
-		padding: 2rem 1.25rem 1.5rem;
+		padding: 2.25rem 1.25rem 1.75rem;
 	}
 
 	.rail--display::before,
 	.rail--master::before,
 	.rail--vault::before,
 	.rail--curator::before {
-		left: 1.25rem;
-		right: 1.25rem;
+		left: 1rem;
+		right: 1rem;
 	}
 }
 
@@ -420,15 +456,6 @@ const next = () => {
 	}
 }
 
-.rail-skeleton {
-	aspect-ratio: 4/5;
-	border-radius: 12px;
-	background: linear-gradient(90deg, #e8e5d8 25%, #ddd9c8 50%, #e8e5d8 75%);
-	background-size: 200% 100%;
-	animation: rail-shimmer 1.5s infinite;
-	border: 1px solid rgba(0, 49, 83, 0.08);
-}
-
 .rail-state-msg {
 	font-family: var(--font-serif);
 	font-style: italic;
@@ -440,14 +467,5 @@ const next = () => {
 
 .rail-error {
 	color: #c2821b;
-}
-
-@keyframes rail-shimmer {
-	0% {
-		background-position: 200% 0;
-	}
-	100% {
-		background-position: -200% 0;
-	}
 }
 </style>

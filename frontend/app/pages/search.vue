@@ -162,7 +162,7 @@
 				</div>
 
 				<!-- Error -->
-				<p v-else-if="searchError" class="search-error">
+				<p v-else-if="searchError" class="inline-error">
 					The curators are having trouble with the catalog. Please try
 					again.
 				</p>
@@ -402,12 +402,4 @@
 		width: 100%;
 	}
 
-	.search-error {
-		font-family: var(--font-serif);
-		font-style: italic;
-		color: #c2821b;
-		font-size: 0.95rem;
-		text-align: center;
-		padding: 2rem 0;
-	}
 </style>

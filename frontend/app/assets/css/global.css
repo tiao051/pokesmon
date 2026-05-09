@@ -39,6 +39,16 @@
 .white-text { color: #fff; }
 .white-text-muted { color: rgba(255, 255, 255, 0.85); }
 
+/* ── Inline page-level error / notice (italic gold serif) ───── */
+.inline-error {
+	font-family: var(--font-serif);
+	font-style: italic;
+	color: #c2821b;
+	font-size: 0.95rem;
+	text-align: center;
+	padding: 2rem 0;
+}
+
 /* ── Page header (page title + subtitle, centered) ────────────── */
 .page-header {
 	text-align: center;

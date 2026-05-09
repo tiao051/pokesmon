@@ -63,7 +63,7 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
 .cart-page {
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: clamp(3rem, 6vw, 5rem) 2rem clamp(4rem, 7vw, 6rem);
+  padding: 0 2rem clamp(4rem, 7vw, 6rem);
 }
 
 .page-header {

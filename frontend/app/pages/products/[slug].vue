@@ -94,13 +94,13 @@
 	<main v-if="detailLoading" class="detail-page">
 		<div class="detail-grid">
 			<div class="detail-image-side">
-				<div class="detail-image-frame skeleton-frame"></div>
+				<div class="detail-image-frame skeleton"></div>
 			</div>
 			<div class="detail-info-side">
-				<div class="skeleton-line skeleton-title"></div>
-				<div class="skeleton-line skeleton-price"></div>
-				<div class="skeleton-line skeleton-desc"></div>
-				<div class="skeleton-line skeleton-desc short"></div>
+				<div class="skeleton skeleton-line skeleton-title"></div>
+				<div class="skeleton skeleton-line skeleton-price"></div>
+				<div class="skeleton skeleton-line skeleton-desc"></div>
+				<div class="skeleton skeleton-line skeleton-desc short"></div>
 			</div>
 		</div>
 	</main>
@@ -686,29 +686,11 @@
 		border-radius: 2px;
 	}
 
-	/* Skeleton loading */
-	.skeleton-frame {
-		background: linear-gradient(
-			90deg,
-			#e8e5d8 25%,
-			#ddd9c8 50%,
-			#e8e5d8 75%
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.5s infinite;
-	}
-
+	/* Skeleton loading (shimmer + bg from global .skeleton) */
 	.skeleton-line {
 		height: 1.25rem;
+		border: none;
 		border-radius: 6px;
-		background: linear-gradient(
-			90deg,
-			#e8e5d8 25%,
-			#ddd9c8 50%,
-			#e8e5d8 75%
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.5s infinite;
 		margin-bottom: 1rem;
 	}
 
@@ -725,14 +707,5 @@
 	}
 	.skeleton-desc.short {
 		width: 55%;
-	}
-
-	@keyframes shimmer {
-		0% {
-			background-position: 200% 0;
-		}
-		100% {
-			background-position: -200% 0;
-		}
 	}
 </style>
