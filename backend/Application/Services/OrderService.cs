@@ -1,3 +1,4 @@
+using backend.Core.Common;
 using backend.Core.DTOs;
 using backend.Core.Entities;
 using backend.Infrastructure.Persistence;
@@ -76,6 +77,7 @@ public class OrderService
 
         var items = new List<OrderItem>();
         decimal total = 0m;
+        decimal deposit = 0m;
 
         foreach (var item in dto.Items)
         {
@@ -83,7 +85,12 @@ public class OrderService
             if (product is null)
                 return OrderOperationResult<OrderResponse>.BadRequest($"Product {item.ProductId} not found");
 
+            if (dto.IsPreorder && !product.IsPreorder)
+                return OrderOperationResult<OrderResponse>.BadRequest(
+                    $"Product {product.ProductId} is not available for pre-order");
+
             var price = product.MarketPrice ?? product.LowestPrice ?? 0m;
+            var lineTotal = price * item.Quantity;
             items.Add(new OrderItem
             {
                 ProductId = product.ProductId,
@@ -93,7 +100,10 @@ public class OrderService
                 Quantity = item.Quantity,
                 Image = product.ImageUrl,
             });
-            total += price * item.Quantity;
+            total += lineTotal;
+
+            if (dto.IsPreorder)
+                deposit += lineTotal * RarityDepositRates.RateFor(product.RarityName);
         }
 
         var order = new Order
@@ -103,7 +113,7 @@ public class OrderService
             Total = total,
             IsPreorder = dto.IsPreorder,
             Status = dto.IsPreorder ? OrderStatus.Stocking : OrderStatus.Placed,
-            DepositAmount = dto.IsPreorder ? Math.Round(total * 0.2m, 2) : null,
+            DepositAmount = dto.IsPreorder ? Math.Round(deposit, 2) : null,
             DepositPaid = false,
         };
 

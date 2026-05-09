@@ -14,6 +14,7 @@ public record ProductResponse(
     string SetName,
     string RarityName,
     bool Sealed,
+    bool IsPreorder,
     List<string> Tags
 );
 

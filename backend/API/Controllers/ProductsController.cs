@@ -18,6 +18,7 @@ public class ProductsController : ControllerBase
         [FromQuery] string? search,
         [FromQuery] decimal? maxPrice,
         [FromQuery(Name = "sealed")] bool? isSealed,
+        [FromQuery(Name = "isPreorder")] bool? isPreorder,
         [FromQuery] string? sort,
         [FromQuery] int page = 1,
         [FromQuery] int limit = 20,
@@ -26,7 +27,7 @@ public class ProductsController : ControllerBase
         if (page < 1 || limit < 1 || limit > 100)
             return BadRequest(new { error = "Invalid page or limit" });
 
-        var query = new ProductListQuery(productType, setName, search, maxPrice, isSealed, sort, page, limit);
+        var query = new ProductListQuery(productType, setName, search, maxPrice, isSealed, isPreorder, sort, page, limit);
         var result = await _service.ListAsync(query, ct);
         return Ok(result);
     }

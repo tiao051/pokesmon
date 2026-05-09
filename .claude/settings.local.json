@@ -21,7 +21,12 @@
       "Bash(true *)",
       "Bash(:)",
       "Bash(Get-ChildItem -Path \"D:\\\\pet-project\\\\pokemon\\\\frontend\\\\app\" -Recurse -Force)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(dir /s /b *.cs)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s \"http://localhost:5044/api/products?isPreorder=true&limit=3\")",
+      "Bash(curl *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); p=d['product']; print\\('isPreorder:', p.get\\('isPreorder'\\), '| tags:', p.get\\('tags'\\)\\)\")"
     ]
   }
 }

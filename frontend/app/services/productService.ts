@@ -14,6 +14,7 @@ export interface ProductListParams {
 	setName?: string;
 	maxPrice?: number;
 	sealed?: boolean;
+	isPreorder?: boolean;
 	sort?: "newest" | "price-desc";
 	page?: number;
 	limit?: number;

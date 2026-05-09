@@ -1,5 +1,6 @@
 import {computed} from "vue";
 import type {Product} from "../types/product";
+import {depositRateFor} from "../utils/depositRates";
 import {usePersistedState} from "./usePersistedState";
 
 export interface CartItem {
@@ -8,6 +9,16 @@ export interface CartItem {
 }
 
 const STORAGE_KEY = "pokegogh-cart";
+
+const sumQty = (list: CartItem[]) => list.reduce((s, i) => s + i.quantity, 0);
+const sumPrice = (list: CartItem[]) =>
+	list.reduce((s, i) => s + i.product.price * i.quantity, 0);
+const sumDeposit = (list: CartItem[]) =>
+	list.reduce(
+		(s, i) =>
+			s + i.product.price * i.quantity * depositRateFor(i.product.rarityName),
+		0,
+	);
 
 export const useCart = () => {
 	const items = usePersistedState<CartItem[]>(STORAGE_KEY, [], "cart");
@@ -46,10 +57,41 @@ export const useCart = () => {
 		items.value = [];
 	};
 
-	const count = computed(() => items.value.reduce((sum, i) => sum + i.quantity, 0));
-	const subtotal = computed(() =>
-		items.value.reduce((sum, i) => sum + i.product.price * i.quantity, 0),
+	const standardItems = computed(() =>
+		items.value.filter((i) => !i.product.isPreorder),
+	);
+	const preorderItems = computed(() =>
+		items.value.filter((i) => i.product.isPreorder),
 	);
 
-	return {items, count, subtotal, add, remove, updateQty, clear};
+	const count = computed(() => sumQty(items.value));
+	const subtotal = computed(() => sumPrice(items.value));
+
+	const standardCount = computed(() => sumQty(standardItems.value));
+	const standardSubtotal = computed(() => sumPrice(standardItems.value));
+
+	const preorderCount = computed(() => sumQty(preorderItems.value));
+	const preorderSubtotal = computed(() => sumPrice(preorderItems.value));
+	const preorderDeposit = computed(() => sumDeposit(preorderItems.value));
+	const preorderRemaining = computed(
+		() => preorderSubtotal.value - preorderDeposit.value,
+	);
+
+	return {
+		items,
+		count,
+		subtotal,
+		add,
+		remove,
+		updateQty,
+		clear,
+		standardItems,
+		standardCount,
+		standardSubtotal,
+		preorderItems,
+		preorderCount,
+		preorderSubtotal,
+		preorderDeposit,
+		preorderRemaining,
+	};
 };

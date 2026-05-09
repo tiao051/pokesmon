@@ -3,9 +3,12 @@ import { computed } from 'vue'
 import { formatPrice } from '../types/product'
 
 const props = defineProps({
+  mode: { type: String, default: 'standard' }, // 'standard' | 'preorder'
   subtotal: { type: Number, required: true },
   shipping: { type: Number, default: 0 },
   tax: { type: Number, default: 0 },
+  deposit: { type: Number, default: 0 },
+  remaining: { type: Number, default: 0 },
   ctaLabel: { type: String, default: '' },
   ctaTo: { type: String, default: '' },
   ctaDisabled: { type: Boolean, default: false },
@@ -13,7 +16,20 @@ const props = defineProps({
 
 const emit = defineEmits(['cta-click'])
 
+const isPreorder = computed(() => props.mode === 'preorder')
 const total = computed(() => props.subtotal + props.shipping + props.tax)
+const headlineLabel = computed(() =>
+  isPreorder.value ? 'Deposit Today' : 'Acquisition Total',
+)
+const headlineValue = computed(() =>
+  isPreorder.value ? props.deposit : total.value,
+)
+const titleText = computed(() =>
+  isPreorder.value ? 'Reservation Summary' : 'Acquisition Summary',
+)
+const eyebrowText = computed(() =>
+  isPreorder.value ? "— Trainer's Reservation —" : "— Trainer's Receipt —",
+)
 
 const handleClick = () => {
   if (!props.ctaDisabled) emit('cta-click')
@@ -21,33 +37,46 @@ const handleClick = () => {
 </script>
 
 <template>
-  <aside class="order-summary">
+  <aside class="order-summary" :class="{ 'is-preorder': isPreorder }">
     <div class="summary-stamp" aria-hidden="true"></div>
 
     <div class="summary-header">
-      <span class="summary-eyebrow">— Trainer's Receipt —</span>
-      <h3 class="summary-title">Acquisition Summary</h3>
+      <span class="summary-eyebrow">{{ eyebrowText }}</span>
+      <h3 class="summary-title">{{ titleText }}</h3>
     </div>
 
     <div class="summary-rows">
       <div class="summary-row">
-        <span class="row-label">Subtotal</span>
+        <span class="row-label">{{ isPreorder ? 'Reservation Subtotal' : 'Subtotal' }}</span>
         <span class="row-value">{{ formatPrice(subtotal) }}</span>
       </div>
-      <div class="summary-row">
-        <span class="row-label">Pokémart Postage</span>
-        <span class="row-value">{{ shipping > 0 ? formatPrice(shipping) : 'Complimentary' }}</span>
-      </div>
-      <div v-if="tax > 0" class="summary-row">
-        <span class="row-label">Estimated Tax</span>
-        <span class="row-value">{{ formatPrice(tax) }}</span>
-      </div>
+
+      <template v-if="isPreorder">
+        <div class="summary-row">
+          <span class="row-label">Due at Delivery</span>
+          <span class="row-value">{{ formatPrice(remaining) }}</span>
+        </div>
+      </template>
+      <template v-else>
+        <div class="summary-row">
+          <span class="row-label">Pokémart Postage</span>
+          <span class="row-value">{{ shipping > 0 ? formatPrice(shipping) : 'Complimentary' }}</span>
+        </div>
+        <div v-if="tax > 0" class="summary-row">
+          <span class="row-label">Estimated Tax</span>
+          <span class="row-value">{{ formatPrice(tax) }}</span>
+        </div>
+      </template>
     </div>
 
     <div class="summary-total">
-      <span class="total-label">Acquisition Total</span>
-      <span class="total-value">{{ formatPrice(total) }}</span>
+      <span class="total-label">{{ headlineLabel }}</span>
+      <span class="total-value">{{ formatPrice(headlineValue) }}</span>
     </div>
+
+    <p v-if="isPreorder" class="preorder-note">
+      Deposit varies by card rarity. The remaining balance is collected upon delivery.
+    </p>
 
     <slot name="extra" />
 
@@ -234,5 +263,17 @@ const handleClick = () => {
 .summary-cta:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.preorder-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: #7a6a55;
+  text-align: center;
+  margin: -0.5rem 0 1.25rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.5;
 }
 </style>

@@ -50,8 +50,9 @@
 			);
 			return false;
 		}
+		const cartName = product.value.isPreorder ? "pre-order cart" : "cart";
 		toast.success(
-			`Added ${result.added} × "${product.value.title}" to your cart.`,
+			`Added ${result.added} × "${product.value.title}" to your ${cartName}.`,
 		);
 		return true;
 	};
@@ -61,7 +62,9 @@
 	};
 
 	const acquireNow = () => {
-		if (tryAdd()) router.push("/cart");
+		if (!tryAdd()) return;
+		const view = product.value?.isPreorder ? "preorder" : "standard";
+		router.push(`/cart?view=${view}`);
 	};
 
 	const related = computed(() => detailData.value?.related ?? []);

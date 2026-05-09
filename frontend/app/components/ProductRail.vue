@@ -9,7 +9,7 @@ const props = defineProps<{
 	pending?: boolean;
 	error?: unknown;
 	viewAllLink?: string;
-	theme?: "display" | "master" | "vault" | "curator";
+	theme?: "display" | "master" | "vault" | "curator" | "preorder";
 	eyebrow?: string;
 }>();
 
@@ -164,7 +164,8 @@ const next = () => {
 .rail--display,
 .rail--master,
 .rail--vault,
-.rail--curator {
+.rail--curator,
+.rail--preorder {
 	position: relative;
 	padding: 2.75rem 2rem 2.25rem;
 	border-radius: 18px;
@@ -179,7 +180,8 @@ const next = () => {
 .rail--display::before,
 .rail--master::before,
 .rail--vault::before,
-.rail--curator::before {
+.rail--curator::before,
+.rail--preorder::before {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -193,7 +195,8 @@ const next = () => {
 .rail--display::after,
 .rail--master::after,
 .rail--vault::after,
-.rail--curator::after {
+.rail--curator::after,
+.rail--preorder::after {
 	content: "";
 	position: absolute;
 	bottom: 0;
@@ -290,6 +293,26 @@ const next = () => {
 	box-shadow: 0 0 10px rgba(194, 130, 27, 0.35);
 }
 
+.rail--preorder {
+	background: linear-gradient(
+		180deg,
+		rgba(178, 34, 34, 0.1) 0%,
+		rgba(178, 34, 34, 0.015) 75%
+	);
+	border-color: rgba(178, 34, 34, 0.2);
+}
+
+.rail--preorder::before {
+	background: linear-gradient(
+		90deg,
+		transparent,
+		#b22222 30%,
+		#b22222 70%,
+		transparent
+	);
+	box-shadow: 0 0 12px rgba(178, 34, 34, 0.4);
+}
+
 .rail-eyebrow {
 	display: block;
 	font-family: var(--font-serif);
@@ -313,18 +336,24 @@ const next = () => {
 	color: #8b5a2b;
 }
 
+.rail--preorder .rail-eyebrow {
+	color: #b22222;
+}
+
 @media (max-width: 768px) {
 	.rail--display,
 	.rail--master,
 	.rail--vault,
-	.rail--curator {
+	.rail--curator,
+	.rail--preorder {
 		padding: 2.25rem 1.25rem 1.75rem;
 	}
 
 	.rail--display::before,
 	.rail--master::before,
 	.rail--vault::before,
-	.rail--curator::before {
+	.rail--curator::before,
+	.rail--preorder::before {
 		left: 1rem;
 		right: 1rem;
 	}

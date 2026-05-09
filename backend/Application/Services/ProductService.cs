@@ -15,6 +15,7 @@ public record ProductListQuery(
     string? Search,
     decimal? MaxPrice,
     bool? Sealed,
+    bool? IsPreorder,
     string? Sort,
     int Page,
     int Limit
@@ -63,7 +64,7 @@ public class ProductService
     }
 
     private static string BuildListCacheKey(ProductListQuery q) =>
-        $"products:list:{q.ProductType}:{q.SetName}:{q.Search}:{q.MaxPrice}:{q.Sealed}:{q.Sort}:{q.Page}:{q.Limit}";
+        $"products:list:{q.ProductType}:{q.SetName}:{q.Search}:{q.MaxPrice}:{q.Sealed}:{q.IsPreorder}:{q.Sort}:{q.Page}:{q.Limit}";
 
     public async Task<ProductDetailResponse?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
@@ -130,6 +131,9 @@ public class ProductService
         if (q.Sealed.HasValue)
             filter &= Builders<Product>.Filter.Eq(p => p.Sealed, q.Sealed.Value);
 
+        if (q.IsPreorder.HasValue)
+            filter &= Builders<Product>.Filter.Eq(p => p.IsPreorder, q.IsPreorder.Value);
+
         return filter;
     }
 
@@ -139,6 +143,10 @@ public class ProductService
         var description = $"{p.ProductTypeName} from the {p.SetName} expansion."
                           + (p.Sealed ? " Factory sealed." : "")
                           + (!string.IsNullOrWhiteSpace(p.RarityName) ? $" Rarity: {p.RarityName}." : "");
+
+        var tags = new List<string>();
+        if (p.Sealed) tags.Add("sealed");
+        if (p.IsPreorder) tags.Add("preorder");
 
         return new ProductResponse(
             Id: p.ProductId,
@@ -156,7 +164,8 @@ public class ProductService
             SetName: p.SetName,
             RarityName: p.RarityName,
             Sealed: p.Sealed,
-            Tags: p.Sealed ? new List<string> { "sealed" } : new List<string>()
+            IsPreorder: p.IsPreorder,
+            Tags: tags
         );
     }
 }

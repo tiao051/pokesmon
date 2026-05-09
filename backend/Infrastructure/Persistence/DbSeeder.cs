@@ -1,3 +1,4 @@
+using backend.Core.Common;
 using backend.Core.Entities;
 using MongoDB.Driver;
 
@@ -5,8 +6,13 @@ namespace backend.Infrastructure.Persistence;
 
 public static class DbSeeder
 {
+    private const int PreorderSeedCount = 8;
+
     public static async Task SeedAsync(MongoDbContext context, IConfiguration config)
     {
+        // Preorder seeding runs regardless of admin credentials so dev always has demo data.
+        await SeedPreorderProductsAsync(context);
+
         var seedEmail = config["SEED_ADMIN_EMAIL"];
         var seedPassword = config["SEED_ADMIN_PASSWORD"];
 
@@ -15,6 +21,25 @@ public static class DbSeeder
 
         await SeedAdminUserAsync(context, seedEmail, seedPassword);
         await SeedSampleOrdersAsync(context, seedEmail);
+    }
+
+    private static async Task SeedPreorderProductsAsync(MongoDbContext context)
+    {
+        var anyPreorder = await context.Products.Find(p => p.IsPreorder).AnyAsync();
+        if (anyPreorder) return;
+
+        var candidates = await context.Products
+            .Find(p => p.ProductLineName == Constants.PokemonProductLine)
+            .SortByDescending(p => p.MarketPrice)
+            .Limit(PreorderSeedCount)
+            .ToListAsync();
+        if (candidates.Count == 0) return;
+
+        var ids = candidates.Select(p => p.ProductId).ToList();
+        var update = Builders<Product>.Update.Set(p => p.IsPreorder, true);
+        await context.Products.UpdateManyAsync(
+            Builders<Product>.Filter.In(p => p.ProductId, ids),
+            update);
     }
 
     private static async Task SeedAdminUserAsync(MongoDbContext context, string email, string password)
@@ -62,7 +87,8 @@ public static class DbSeeder
         string status,
         DateTime createdAt)
     {
-        var items = products.Select(p => new OrderItem
+        var productList = products.ToList();
+        var items = productList.Select(p => new OrderItem
         {
             ProductId = p.ProductId,
             Slug = p.ProductUrlName,
@@ -73,6 +99,14 @@ public static class DbSeeder
         }).ToList();
 
         var total = items.Sum(i => i.Price * i.Quantity);
+        decimal? deposit = null;
+        if (isPreorder)
+        {
+            var depositSum = productList.Zip(items, (p, i) =>
+                i.Price * i.Quantity * RarityDepositRates.RateFor(p.RarityName)).Sum();
+            deposit = Math.Round(depositSum, 2);
+        }
+
         return new Order
         {
             UserEmail = email,
@@ -80,7 +114,7 @@ public static class DbSeeder
             Total = total,
             Status = status,
             IsPreorder = isPreorder,
-            DepositAmount = isPreorder ? Math.Round(total * 0.2m, 2) : null,
+            DepositAmount = deposit,
             DepositPaid = isPreorder && status != OrderStatus.Stocking,
             CreatedAt = createdAt,
             UpdatedAt = createdAt,

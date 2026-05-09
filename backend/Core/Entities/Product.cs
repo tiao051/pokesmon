@@ -40,6 +40,9 @@ public class Product
     [BsonElement("sealed")]
     public bool Sealed { get; set; }
 
+    [BsonElement("isPreorder")]
+    public bool IsPreorder { get; set; }
+
     [BsonElement("listings")]
     public int Listings { get; set; }
 

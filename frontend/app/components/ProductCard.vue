@@ -19,7 +19,8 @@ const handleAdd = () => {
 		toast.error(`The full reserve of "${props.product.title}" is already in your cart.`);
 		return;
 	}
-	toast.success(`Added "${props.product.title}" to your cart.`);
+	const cartName = props.product.isPreorder ? "pre-order cart" : "cart";
+	toast.success(`Added "${props.product.title}" to your ${cartName}.`);
 };
 
 const productRef = toRef(props, "product");

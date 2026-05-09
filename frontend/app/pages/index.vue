@@ -62,6 +62,14 @@
 	);
 
 	const {
+		data: preorderData,
+		pending: preorderPending,
+		error: preorderError,
+	} = useLazyRail("preorder", () =>
+		productService.getProducts({limit: RAIL_LIMIT, isPreorder: true}),
+	);
+
+	const {
 		data: curatorData,
 		pending: curatorPending,
 		error: curatorError,
@@ -82,6 +90,7 @@
 	const newestProducts = computed(() => newestData.value?.items ?? []);
 	const topPricedProducts = computed(() => topPricedData.value?.items ?? []);
 	const sealedProducts = computed(() => sealedData.value?.items ?? []);
+	const preorderProducts = computed(() => preorderData.value?.items ?? []);
 	const curatorProducts = computed(() => curatorData.value?.items ?? []);
 	const curatorSet = computed(() => curatorData.value?.curatorSet ?? null);
 
@@ -271,8 +280,20 @@
 			<h3 class="section-title">Featured from the Collection</h3>
 
 			<ProductRail
+				v-if="preorderPending || preorderProducts.length"
+				theme="preorder"
+				eyebrow="Wing 01 · Future Acquisitions"
+				title="Awaiting Arrival"
+				subtitle="Reserve a place for pieces still en route to the gallery"
+				:products="preorderProducts"
+				:pending="preorderPending"
+				:error="preorderError"
+				view-all-link="/products?isPreorder=true"
+			/>
+
+			<ProductRail
 				theme="display"
-				eyebrow="Wing 01 · Recently Acquired"
+				eyebrow="Wing 02 · Recently Acquired"
 				title="Now on Display"
 				subtitle="Latest acquisitions, freshly curated"
 				:products="newestProducts"
@@ -282,7 +303,7 @@
 
 			<ProductRail
 				theme="master"
-				eyebrow="Wing 02 · Premier Selection"
+				eyebrow="Wing 03 · Premier Selection"
 				title="Master Collection"
 				subtitle="The gallery's most prized pieces"
 				:products="topPricedProducts"
@@ -293,7 +314,7 @@
 
 			<ProductRail
 				theme="vault"
-				eyebrow="Wing 03 · Sealed Archive"
+				eyebrow="Wing 04 · Sealed Archive"
 				title="Vault Treasures"
 				subtitle="Sealed and untouched, just as they arrived"
 				:products="sealedProducts"
@@ -305,7 +326,7 @@
 			<ProductRail
 				v-if="curatorPending || curatorSet"
 				theme="curator"
-				eyebrow="Wing 04 · Daily Curation"
+				eyebrow="Wing 05 · Daily Curation"
 				title="Curator's Eye"
 				:subtitle="curatorSet ? `A daily look into the ${curatorSet} expansion` : 'A daily look into our curated expansions'"
 				:products="curatorProducts"

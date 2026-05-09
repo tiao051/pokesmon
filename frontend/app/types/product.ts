@@ -12,6 +12,7 @@ export interface Product {
 	setName: string;
 	rarityName: string;
 	sealed: boolean;
+	isPreorder: boolean;
 	tags: string[];
 }
 

@@ -21,11 +21,12 @@
 	const selectedType = ref(route.query.productType?.toString() ?? "");
 	const selectedSet = ref(route.query.setName?.toString() ?? "");
 	const onlySealed = ref(route.query.sealed === "true");
+	const onlyPreorder = ref(route.query.isPreorder === "true");
 
 	const page = ref(1);
 	const limit = 20;
 
-	watch([selectedType, selectedSet, onlySealed], () => {
+	watch([selectedType, selectedSet, onlySealed, onlyPreorder], () => {
 		page.value = 1;
 	});
 
@@ -34,6 +35,7 @@
 		if (selectedType.value) params.productType = selectedType.value;
 		if (selectedSet.value) params.setName = selectedSet.value;
 		if (onlySealed.value) params.sealed = true;
+		if (onlyPreorder.value) params.isPreorder = true;
 		return params;
 	});
 
