@@ -1,7 +1,7 @@
 namespace backend.Core.DTOs;
 
-public record UserDto(string Id, string Email, string Username, bool IsVerified);
-public record RegisterDto(string Email, string Username, string Password);
+public record UserDto(string Id, string Email, bool IsVerified);
+public record RegisterDto(string Email, string Password);
 public record LoginDto(string Email, string Password);
 public record AuthResponseDto(UserDto User, string Token);
 public record VerifyEmailDto(string Email, string Pin);

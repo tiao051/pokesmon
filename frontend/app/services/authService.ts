@@ -33,7 +33,6 @@ function getApi(): AxiosInstance {
 
 export interface User {
 	email: string;
-	username: string;
 }
 
 export interface AuthResponse {
@@ -44,7 +43,7 @@ export interface AuthResponse {
 export const authService = {
 	/**
 	 * Đăng ký tài khoản mới
-	 * @param userData - { email, username, password }
+	 * @param userData - { email, password }
 	 */
 	async register(userData: any): Promise<any> {
 		try {

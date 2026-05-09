@@ -4,7 +4,7 @@ A learning project pairing an ASP.NET Core minimal API with a Nuxt 4 frontend. K
 
 ## Stack (current reality)
 
-- **Backend**: ASP.NET Core, `net10.0`, minimal API template. `Microsoft.AspNetCore.OpenApi` is configured. Nullable + implicit usings enabled. Entry point is `backend/Program.cs`.
+- **Backend**: ASP.NET Core, `net8.0`, minimal API template. `Microsoft.AspNetCore.OpenApi` is configured. Nullable + implicit usings enabled. Entry point is `backend/Program.cs`.
 - **Frontend**: Nuxt `^4.4.2`, Vue `^3.5`, `vue-router`, TypeScript. File-based routing. Layout is `app/app.vue`, `app/pages/`, `app/components/`, `app/layouts/`.
 - **Solution**: `pokemon.sln` at the repo root references `backend/backend.csproj`.
 
@@ -14,7 +14,7 @@ Do **not** assume the project has EF Core, PostgreSQL, JWT auth, controllers, a 
 
 ```
 pokemon/
-  backend/                ASP.NET Core minimal API (net10)
+  backend/                ASP.NET Core minimal API (net8)
     Program.cs
     backend.csproj
   frontend/               Nuxt 4 app
@@ -44,7 +44,7 @@ Always use paths relative to the repo root.
 
 For deeper guidance, use the matching skill:
 
-- `backend-expert` — ASP.NET Core net10 minimal API conventions, endpoint layout, validation, OpenAPI.
+- `backend-expert` — ASP.NET Core net8 minimal API conventions, endpoint layout, validation, OpenAPI.
 - `frontend-expert` — Nuxt 4 + Vue 3 conventions, routing, data fetching with `useFetch`/`useAsyncData`, composables.
 
 These skills live under `.claude/skills/` (and are mirrored in `.agents/skills/` for the Copilot tooling).

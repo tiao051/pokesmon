@@ -38,11 +38,10 @@ public class EmailService
     // --------------------------------------------------------------------------------
     // 1. ACCOUNT ACTIVATION PIN (Register)
     // --------------------------------------------------------------------------------
-    public async Task SendRegistrationPinEmailAsync(string toEmail, string username, string pin)
+    public async Task SendRegistrationPinEmailAsync(string toEmail, string pin)
     {
         var placeholders = new Dictionary<string, string>
         {
-            { "username", username },
             { "pin", pin }
         };
         string content = await LoadTemplateAsync("RegistrationPin", placeholders);
@@ -120,7 +119,7 @@ public class EmailService
             Console.WriteLine($"\n--- [Mock Email Sent] ---");
             Console.WriteLine($"To: {toEmail}");
             Console.WriteLine($"Subject: {subject}");
-            Console.WriteLine($"[HTML content generated and ready]");
+            Console.WriteLine(finalHtmlContent);
             Console.WriteLine($"-------------------------\n");
             return;
         }

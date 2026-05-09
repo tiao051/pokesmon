@@ -10,7 +10,17 @@
 	const router = useRouter()
 	const isMobileMenuOpen = ref(false)
 	const { count } = useCart()
-	const { isLoggedIn, username, signOut } = useAuth()
+	const { isLoggedIn, email, avatar, signOut } = useAuth()
+
+	const DEFAULT_AVATAR = '/images/red_pokeball.jpg'
+	const headerAvatar = computed(() => avatar.value || DEFAULT_AVATAR)
+
+	const trainerLabel = computed(() => {
+		const e = email.value
+		if (!e) return ''
+		const local = e.split('@')[0] ?? ''
+		return local.charAt(0).toUpperCase() + local.slice(1)
+	})
 	const { history, addSearchTerm } = useSearchHistory()
 
 	const searchQuery = ref('')
@@ -238,13 +248,13 @@
 						role="button"
 						aria-haspopup="true"
 					>
-						<svg viewBox="0 0 24 24" fill="currentColor">
-							<path
-								d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10 10.07 6.5 12 6.5zm0 13c-2.65 0-5-1.28-6.5-3.23.04-2.15 4.33-3.34 6.5-3.34s6.46 1.19 6.5 3.34c-1.5 1.95-3.85 3.23-6.5 3.23z"
-							/>
-						</svg>
-						<span v-if="username" class="user-name">{{
-							username
+						<img
+							:src="headerAvatar"
+							alt="Trainer avatar"
+							class="user-avatar"
+						/>
+						<span v-if="trainerLabel" class="user-name">{{
+							trainerLabel
 						}}</span>
 					</div>
 					<div class="user-dropdown" role="menu">
@@ -425,6 +435,15 @@
 	.user-menu-trigger svg {
 		width: 44px;
 		height: 44px;
+	}
+
+	.user-avatar {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 2px solid var(--color-prussian-blue);
+		background-color: #fff;
 	}
 
 	.user-name {

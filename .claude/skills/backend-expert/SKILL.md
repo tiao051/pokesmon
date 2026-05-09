@@ -1,13 +1,13 @@
 ---
 name: backend-expert
-description: "Use when: implementing backend endpoints and application logic in this project. Tech: ASP.NET Core net10 minimal API, OpenAPI, C#. Keep architecture simple and evolvable."
+description: "Use when: implementing backend endpoints and application logic in this project. Tech: ASP.NET Core net8 minimal API, OpenAPI, C#. Keep architecture simple and evolvable."
 ---
 
-# Pokemon Backend Guidelines (ASP.NET Core net10)
+# Pokemon Backend Guidelines (ASP.NET Core net8)
 
 ## Current Reality (Must Follow)
 - Framework: ASP.NET Core (minimal API template)
-- Target: net10.0
+- Target: net8.0
 - OpenAPI: Microsoft.AspNetCore.OpenApi is configured
 - Nullable and implicit usings are enabled
 - Entry point: Program.cs currently holds endpoint mapping
@@ -103,7 +103,7 @@ No backend test project is visible yet.
 5. Assuming auth/database stack exists when it is not configured.
 
 ## Quick Checklist Before Finalizing
-- Is this aligned with current net10 minimal API setup?
+- Is this aligned with current net8 minimal API setup?
 - Are endpoint contracts clear and typed enough?
 - Are validation and status codes explicit?
 - Is logic placed in a maintainable location?

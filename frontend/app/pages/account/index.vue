@@ -7,7 +7,6 @@ definePageMeta({
 
 const {
   email,
-  username,
   avatar,
   storedDisplayName,
   phone,
@@ -23,7 +22,6 @@ const DEFAULT_AVATAR = '/images/red_pokeball.jpg'
 const currentAvatar = computed(() => avatar.value || DEFAULT_AVATAR)
 
 const derivedDisplayName = computed(() => {
-  if (username.value) return username.value
   const e = email.value
   if (!e) return 'Trainer'
   const local = e.split('@')[0] ?? 'Trainer'

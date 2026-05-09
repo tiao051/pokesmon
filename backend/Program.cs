@@ -39,6 +39,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var mongo = scope.ServiceProvider.GetRequiredService<backend.Infrastructure.Persistence.MongoDbContext>();
+    await backend.Infrastructure.Persistence.DbSeeder.SeedAsync(mongo);
+}
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 

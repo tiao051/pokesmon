@@ -15,7 +15,6 @@ export type LocationPatch = Partial<LocationInput>;
 export interface AuthState {
 	isLoggedIn: boolean;
 	email?: string;
-	username?: string;
 	avatar?: string;
 	displayName?: string;
 	phone?: string;
@@ -93,7 +92,20 @@ export const useAuth = () => {
 		state.value = {
 			isLoggedIn: true,
 			email: data.user.email,
-			username: data.user.username,
+			locations: state.value.locations ?? [...SAMPLE_LOCATIONS],
+		};
+		return data;
+	};
+
+	const signUp = async (email: string, password: string) => {
+		return await authService.register({email, password});
+	};
+
+	const verifyEmail = async (email: string, pin: string) => {
+		const data = await authService.verifyEmail({email, pin});
+		state.value = {
+			isLoggedIn: true,
+			email: data.user.email,
 			locations: state.value.locations ?? [...SAMPLE_LOCATIONS],
 		};
 		return data;
@@ -225,7 +237,6 @@ export const useAuth = () => {
 	return {
 		isLoggedIn: computed(() => state.value.isLoggedIn),
 		email: computed(() => state.value.email),
-		username: computed(() => state.value.username),
 		avatar: computed(() => state.value.avatar),
 		storedDisplayName: computed(() => state.value.displayName),
 		phone: computed(() => state.value.phone),
@@ -234,6 +245,8 @@ export const useAuth = () => {
 			(state.value.locations ?? []).find((l) => l.isDefault),
 		),
 		signIn,
+		signUp,
+		verifyEmail,
 		signOut,
 		setAvatar,
 		updateProfile,

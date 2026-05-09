@@ -33,7 +33,6 @@ public class AuthController : ControllerBase
         var user = new User
         {
             Email = dto.Email,
-            Username = dto.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             IsVerified = false
         };
@@ -51,7 +50,7 @@ public class AuthController : ControllerBase
         await _context.RegistrationPins.InsertOneAsync(regPin);
 
         // Send PIN email asynchronously
-        _ = _emailService.SendRegistrationPinEmailAsync(user.Email, user.Username, pin);
+        _ = _emailService.SendRegistrationPinEmailAsync(user.Email, pin);
 
         return Ok(new { message = "Registration successful. Please check your email for the verification PIN." });
     }
@@ -76,7 +75,7 @@ public class AuthController : ControllerBase
         await _context.RegistrationPins.DeleteManyAsync(p => p.Email == dto.Email); // clean up pins
 
         var token = _tokenService.GenerateToken(user);
-        var userDto = new UserDto(user.Id!, user.Email, user.Username, user.IsVerified);
+        var userDto = new UserDto(user.Id!, user.Email, user.IsVerified);
 
         return Ok(new AuthResponseDto(userDto, token));
     }
@@ -96,7 +95,7 @@ public class AuthController : ControllerBase
         }
 
         var token = _tokenService.GenerateToken(user);
-        var userDto = new UserDto(user.Id!, user.Email, user.Username, user.IsVerified);
+        var userDto = new UserDto(user.Id!, user.Email, user.IsVerified);
 
         return Ok(new AuthResponseDto(userDto, token));
     }

@@ -7,7 +7,7 @@
 
 	const route = useRoute();
 	const router = useRouter();
-	const {signIn} = useAuth();
+	const {signIn, signUp} = useAuth();
 
 	const isLogin = ref(true);
 	const submitting = ref(false);
@@ -21,6 +21,7 @@
 
 	const toggleAuthMode = () => {
 		isLogin.value = !isLogin.value;
+		errorMessage.value = "";
 	};
 
 	const handleSubmit = async () => {
@@ -29,17 +30,38 @@
 			errorMessage.value = "Please fill in all fields.";
 			return;
 		}
+		if (!isLogin.value) {
+			if (form.password !== form.confirmPassword) {
+				errorMessage.value = "Passwords do not match.";
+				return;
+			}
+			if (form.password.length < 8) {
+				errorMessage.value = "Password must be at least 8 characters.";
+				return;
+			}
+		}
 		submitting.value = true;
 		try {
-			await signIn(form.email, form.password);
-			const redirect =
-				typeof route.query.redirect === "string" ?
-					route.query.redirect
-				:	"/";
-			router.push(redirect);
+			if (isLogin.value) {
+				await signIn(form.email, form.password);
+				const redirect =
+					typeof route.query.redirect === "string" ?
+						route.query.redirect
+					:	"/";
+				router.push(redirect);
+			} else {
+				await signUp(form.email, form.password);
+				router.push({
+					path: "/verify-email",
+					query: {email: form.email},
+				});
+			}
 		} catch (err: any) {
 			errorMessage.value =
-				err?.message || "Login failed. Please try again.";
+				err?.message ||
+				(isLogin.value ?
+					"Login failed. Please try again."
+				:	"Registration failed. Please try again.");
 		} finally {
 			submitting.value = false;
 		}
@@ -145,7 +167,9 @@
 							class="auth-submit-btn"
 							:disabled="submitting"
 						>
-							<span v-if="submitting">Signing in...</span>
+							<span v-if="submitting">{{
+								isLogin ? "Signing in..." : "Creating account..."
+							}}</span>
 							<span v-else>{{
 								isLogin ? "Sign In" : "Create Account"
 							}}</span>

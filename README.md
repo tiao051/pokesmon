@@ -5,7 +5,7 @@ A learning project that pairs an ASP.NET Core minimal API with a Nuxt 4 frontend
 ## Stack
 
 **Backend** — `backend/`
-- ASP.NET Core, target framework `net10.0`
+- ASP.NET Core, target framework `net8.0`
 - Minimal API template (`Program.cs`)
 - `Microsoft.AspNetCore.OpenApi`
 - Nullable + implicit usings enabled
@@ -40,7 +40,7 @@ pokemon/
 
 ## Prerequisites
 
-- .NET SDK matching `net10.0`
+- .NET SDK matching `net8.0`
 - Node.js (LTS recommended) and `npm`
 
 ## Getting started
