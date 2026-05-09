@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using backend.Core.Entities;
 using backend.Core.DTOs;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using backend.Infrastructure.Persistence;
+using System.Text.RegularExpressions;
 
 namespace backend.API.Controllers;
 
@@ -11,10 +14,15 @@ namespace backend.API.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly MongoDbContext _context;
+    private readonly IMemoryCache _cache;
 
-    public ProductsController(MongoDbContext context)
+    private static readonly TimeSpan CategoriesCacheTtl = TimeSpan.FromMinutes(10);
+    private const string CategoriesCacheKey = "products:categories";
+
+    public ProductsController(MongoDbContext context, IMemoryCache cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     /// <summary>
@@ -38,11 +46,11 @@ public class ProductsController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var searchLower = search.ToLowerInvariant();
-            filter &= Builders<Product>.Filter.Where(p =>
-                p.ProductName.ToLower().Contains(searchLower) ||
-                p.SetName.ToLower().Contains(searchLower) ||
-                p.ProductTypeName.ToLower().Contains(searchLower));
+            var pattern = new BsonRegularExpression(Regex.Escape(search), "i");
+            filter &= Builders<Product>.Filter.Or(
+                Builders<Product>.Filter.Regex(p => p.ProductName, pattern),
+                Builders<Product>.Filter.Regex(p => p.SetName, pattern),
+                Builders<Product>.Filter.Regex(p => p.ProductTypeName, pattern));
         }
 
         var total = await _context.Products.CountDocumentsAsync(filter);
@@ -54,7 +62,7 @@ public class ProductsController : ControllerBase
             .Limit(limit)
             .ToListAsync();
 
-        var items = products.Select(MapToResponse).ToList();
+        var items = products.Select(p => MapToResponse(p, includeBase64: false)).ToList();
 
         return Ok(new { items, total, page, limit });
     }
@@ -82,8 +90,8 @@ public class ProductsController : ControllerBase
 
         return Ok(new
         {
-            product = MapToResponse(product),
-            related = related.Select(MapToResponse).ToList()
+            product = MapToResponse(product, includeBase64: true),
+            related = related.Select(p => MapToResponse(p, includeBase64: false)).ToList()
         });
     }
 
@@ -93,28 +101,31 @@ public class ProductsController : ControllerBase
     [HttpGet("categories")]
     public async Task<ActionResult> GetCategories()
     {
-        var products = await _context.Products
-            .Find(p => p.ProductLineName == "Pokemon")
-            .ToListAsync();
+        if (_cache.TryGetValue(CategoriesCacheKey, out object? cached) && cached is not null)
+            return Ok(cached);
 
-        var productTypes = products
-            .Select(p => p.ProductTypeName)
+        var baseFilter = Builders<Product>.Filter.Eq(p => p.ProductLineName, "Pokemon");
+
+        var typeCursor = await _context.Products.DistinctAsync(p => p.ProductTypeName, baseFilter);
+        var setCursor = await _context.Products.DistinctAsync(p => p.SetName, baseFilter);
+
+        var productTypes = (await typeCursor.ToListAsync())
             .Where(t => !string.IsNullOrWhiteSpace(t))
-            .Distinct()
             .OrderBy(t => t)
             .ToList();
 
-        var setNames = products
-            .Select(p => p.SetName)
+        var setNames = (await setCursor.ToListAsync())
             .Where(s => !string.IsNullOrWhiteSpace(s))
-            .Distinct()
             .OrderBy(s => s)
             .ToList();
 
-        return Ok(new { productTypes, setNames });
+        var result = new { productTypes, setNames };
+        _cache.Set(CategoriesCacheKey, result, CategoriesCacheTtl);
+
+        return Ok(result);
     }
 
-    private static ProductResponse MapToResponse(Product p)
+    private static ProductResponse MapToResponse(Product p, bool includeBase64)
     {
         var stock = p.Listings > 0 ? p.Listings : 1;
         var description = $"{p.ProductTypeName} from the {p.SetName} expansion."
@@ -129,7 +140,7 @@ public class ProductsController : ControllerBase
             Image: string.IsNullOrWhiteSpace(p.ImageUrl)
                 ? $"https://placehold.co/400x500/003153/FFC512?text={Uri.EscapeDataString(p.ProductName)}"
                 : p.ImageUrl,
-            ImageBase64: p.ImageBase64,
+            ImageBase64: includeBase64 ? p.ImageBase64 : null,
             Description: description,
             Stock: stock,
             Category: p.ProductTypeName,
