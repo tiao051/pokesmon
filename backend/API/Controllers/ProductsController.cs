@@ -34,6 +34,8 @@ public class ProductsController : ControllerBase
         [FromQuery] string? setName = null,
         [FromQuery] string? search = null,
         [FromQuery] decimal? maxPrice = null,
+        [FromQuery(Name = "sealed")] bool? isSealed = null,
+        [FromQuery] string? sort = null,
         [FromQuery] int page = 1,
         [FromQuery] int limit = 20)
     {
@@ -57,11 +59,20 @@ public class ProductsController : ControllerBase
         if (maxPrice.HasValue)
             filter &= Builders<Product>.Filter.Lte(p => p.MarketPrice, maxPrice.Value);
 
+        if (isSealed.HasValue)
+            filter &= Builders<Product>.Filter.Eq(p => p.Sealed, isSealed.Value);
+
+        var sortDef = sort switch
+        {
+            "newest" => Builders<Product>.Sort.Descending(p => p.CreatedAt),
+            _ => Builders<Product>.Sort.Descending(p => p.MarketPrice),
+        };
+
         var total = await _context.Products.CountDocumentsAsync(filter);
 
         var products = await _context.Products
             .Find(filter)
-            .SortByDescending(p => p.MarketPrice)
+            .Sort(sortDef)
             .Skip((page - 1) * limit)
             .Limit(limit)
             .ToListAsync();

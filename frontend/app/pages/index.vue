@@ -2,15 +2,51 @@
 	import {ref, onMounted, onUnmounted, computed} from "vue";
 	import {productService} from "../services/productService";
 
-	const {
-		data: featuredData,
-		pending: featuredLoading,
-		error: featuredError,
-	} = await useAsyncData("featured-products", () =>
-		productService.getProducts({limit: 8}),
-	);
+	const RAIL_LIMIT = 8;
 
-	const featuredProducts = computed(() => featuredData.value?.items ?? []);
+	const dayOfYearSeed = () => {
+		const now = new Date();
+		const start = new Date(now.getFullYear(), 0, 0);
+		return Math.floor((now.getTime() - start.getTime()) / 86_400_000);
+	};
+
+	const {
+		data: homeData,
+		pending: homeLoading,
+		error: homeError,
+	} = await useAsyncData("home-rails", async () => {
+		const categories = await productService.getCategories();
+		const setNames = categories.setNames ?? [];
+		const curatorSet = setNames.length
+			? setNames[dayOfYearSeed() % setNames.length]
+			: null;
+
+		const [newest, topPriced, sealed, curator] = await Promise.all([
+			productService.getProducts({limit: RAIL_LIMIT, sort: "newest"}),
+			productService.getProducts({limit: RAIL_LIMIT}),
+			productService.getProducts({limit: RAIL_LIMIT, sealed: true}),
+			curatorSet
+				? productService.getProducts({
+					limit: RAIL_LIMIT,
+					setName: curatorSet,
+				})
+				: Promise.resolve(null),
+		]);
+
+		return {
+			newest: newest.items,
+			topPriced: topPriced.items,
+			sealed: sealed.items,
+			curator: curator?.items ?? [],
+			curatorSet,
+		};
+	});
+
+	const newestProducts = computed(() => homeData.value?.newest ?? []);
+	const topPricedProducts = computed(() => homeData.value?.topPriced ?? []);
+	const sealedProducts = computed(() => homeData.value?.sealed ?? []);
+	const curatorProducts = computed(() => homeData.value?.curator ?? []);
+	const curatorSet = computed(() => homeData.value?.curatorSet ?? null);
 
 	const newsItems = ref([
 		{
@@ -188,35 +224,40 @@
 			/>
 			<h3 class="section-title">Featured from the Collection</h3>
 
-			<!-- Loading -->
-			<div v-if="featuredLoading" class="product-grid">
-				<div
-					v-for="n in 4"
-					:key="n"
-					class="product-card-skeleton"
-				></div>
-			</div>
+			<ProductRail
+				title="Now on Display"
+				subtitle="Latest acquisitions, freshly curated"
+				:products="newestProducts"
+				:pending="homeLoading"
+				:error="homeError"
+			/>
 
-			<!-- Error -->
-			<p v-else-if="featuredError" class="featured-error">
-				The gallery wings are temporarily closed. Please try again
-				shortly.
-			</p>
+			<ProductRail
+				title="Master Collection"
+				subtitle="The gallery's most prized pieces"
+				:products="topPricedProducts"
+				:pending="homeLoading"
+				:error="homeError"
+				view-all-link="/products"
+			/>
 
-			<!-- Product Grid -->
-			<div v-else-if="featuredProducts.length" class="product-grid">
-				<ProductCard
-					v-for="product in featuredProducts"
-					:key="product.id"
-					:product="product"
-				/>
-			</div>
+			<ProductRail
+				title="Vault Treasures"
+				subtitle="Sealed and untouched, just as they arrived"
+				:products="sealedProducts"
+				:pending="homeLoading"
+				:error="homeError"
+				view-all-link="/products?sealed=true"
+			/>
 
-			<!-- Empty -->
-			<EmptyState
-				v-else
-				title="The gallery awaits its first masterpiece"
-				message="New artifacts are being curated. Return soon."
+			<ProductRail
+				v-if="curatorSet"
+				title="Curator's Eye"
+				:subtitle="`A daily look into the ${curatorSet} expansion`"
+				:products="curatorProducts"
+				:pending="homeLoading"
+				:error="homeError"
+				:view-all-link="`/products?setName=${encodeURIComponent(curatorSet)}`"
 			/>
 
 			<div class="load-more-container">
@@ -296,35 +337,4 @@
 		transform: rotate(-6deg);
 	}
 
-	.product-card-skeleton {
-		aspect-ratio: 4/5;
-		border-radius: 12px;
-		background: linear-gradient(
-			90deg,
-			#e8e5d8 25%,
-			#ddd9c8 50%,
-			#e8e5d8 75%
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.5s infinite;
-		border: 1px solid rgba(0, 49, 83, 0.08);
-	}
-
-	.featured-error {
-		font-family: var(--font-serif);
-		font-style: italic;
-		color: #c2821b;
-		font-size: 0.95rem;
-		text-align: center;
-		padding: 1.5rem 0;
-	}
-
-	@keyframes shimmer {
-		0% {
-			background-position: 200% 0;
-		}
-		100% {
-			background-position: -200% 0;
-		}
-	}
 </style>

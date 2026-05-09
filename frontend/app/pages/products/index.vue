@@ -1,6 +1,9 @@
 <script setup>
 	import {ref, computed, watch} from "vue";
+	import {useRoute} from "vue-router";
 	import {productService} from "../../services/productService";
+
+	const route = useRoute();
 
 	const {
 		data: apiCategories,
@@ -15,13 +18,14 @@
 	);
 	const setNames = computed(() => apiCategories.value?.setNames ?? []);
 
-	const selectedType = ref("");
-	const selectedSet = ref("");
+	const selectedType = ref(route.query.productType?.toString() ?? "");
+	const selectedSet = ref(route.query.setName?.toString() ?? "");
+	const onlySealed = ref(route.query.sealed === "true");
 
 	const page = ref(1);
 	const limit = 20;
 
-	watch([selectedType, selectedSet], () => {
+	watch([selectedType, selectedSet, onlySealed], () => {
 		page.value = 1;
 	});
 
@@ -29,6 +33,7 @@
 		const params = {limit, page: page.value};
 		if (selectedType.value) params.productType = selectedType.value;
 		if (selectedSet.value) params.setName = selectedSet.value;
+		if (onlySealed.value) params.sealed = true;
 		return params;
 	});
 

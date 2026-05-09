@@ -23,6 +23,17 @@ export interface ProductListResponse {
 	limit: number;
 }
 
+export interface ProductListParams {
+	search?: string;
+	productType?: string;
+	setName?: string;
+	maxPrice?: number;
+	sealed?: boolean;
+	sort?: "newest" | "price-desc";
+	page?: number;
+	limit?: number;
+}
+
 export interface CategoriesResponse {
 	productTypes: string[];
 	setNames: string[];
@@ -48,9 +59,8 @@ export const productService = {
 
 	/**
 	 * Lấy danh sách sản phẩm (có hỗ trợ filter, search, phân trang)
-	 * @param params - { productType, setName, search, page, limit }
 	 */
-	async getProducts(params: any = {}): Promise<ProductListResponse> {
+	async getProducts(params: ProductListParams = {}): Promise<ProductListResponse> {
 		try {
 			const response = await getApi().get<ProductListResponse>("/products", { params });
 			return response.data;

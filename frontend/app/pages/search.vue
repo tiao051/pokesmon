@@ -3,7 +3,7 @@
 	import { useRoute } from 'vue-router'
 	import { productService } from '../services/productService'
 
-	const PRICE_MAX = 500
+	const PRICE_MAX = 2000
 	const PRICE_COMMIT_DEBOUNCE_MS = 300
 	const itemsPerPage = 8
 
@@ -143,8 +143,14 @@
 						<h3 :class="{ 'is-pending': isDraggingPrice }">
 							Max Price:
 							<span class="price-val">${{ maxPrice }}</span>
-							<span v-if="isDraggingPrice" class="price-hint">Release to apply</span>
 						</h3>
+						<p
+							class="price-hint"
+							:class="{ 'is-visible': isDraggingPrice }"
+							aria-live="polite"
+						>
+							Release to apply
+						</p>
 						<input
 							type="range"
 							min="0"
@@ -376,13 +382,26 @@
 	}
 
 	.price-hint {
-		margin-left: 0.5rem;
+		margin: 0;
+		height: 0;
+		overflow: hidden;
+		line-height: 0.9rem;
 		font-family: var(--font-sans);
 		font-size: 0.7rem;
 		font-weight: 400;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		color: #999;
+		opacity: 0;
+		transition: height 0.2s ease, margin-bottom 0.2s ease,
+			opacity 0.2s ease;
+		pointer-events: none;
+	}
+
+	.price-hint.is-visible {
+		height: 0.9rem;
+		margin-bottom: 0.4rem;
+		opacity: 1;
 	}
 
 	.price-slider {
