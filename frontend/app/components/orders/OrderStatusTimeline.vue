@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {flowFor, STATUS_LABELS, type OrderStatus} from "../services/orderService";
+import {flowFor, STATUS_LABELS, type OrderStatus} from "../../services/orders.service";
 
 const props = defineProps<{
 	status: OrderStatus;

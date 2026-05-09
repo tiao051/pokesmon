@@ -1,5 +1,5 @@
 import {computed, type Ref} from "vue";
-import type {Product} from "../types/product";
+import type {Product} from "../../types/product";
 
 export function useProductImage(product: Ref<Product | null | undefined> | Product) {
 	const get = () => (typeof product === "object" && "value" in product ? product.value : product);

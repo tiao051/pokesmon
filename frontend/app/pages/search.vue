@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref, computed, watch, onBeforeUnmount } from 'vue'
 	import { useRoute } from 'vue-router'
-	import { productService } from '../services/productService'
+	import { productService } from '../services/products.service'
 
 	const PRICE_MAX = 2000
 	const PRICE_COMMIT_DEBOUNCE_MS = 300

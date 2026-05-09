@@ -1,7 +1,7 @@
 import {computed} from "vue";
-import type {Product} from "../types/product";
-import {depositRateFor} from "../utils/depositRates";
-import {usePersistedState} from "./usePersistedState";
+import type {Product} from "../../types/product";
+import {depositRateFor} from "../../utils/depositRates";
+import {usePersistedState} from "../shared/usePersistedState";
 
 export interface CartItem {
 	product: Product;

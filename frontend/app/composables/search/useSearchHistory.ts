@@ -1,4 +1,4 @@
-import {usePersistedState} from "./usePersistedState";
+import {usePersistedState} from "../shared/usePersistedState";
 
 const STORAGE_KEY = "pokegogh-search-history";
 const MAX_TERMS = 5;

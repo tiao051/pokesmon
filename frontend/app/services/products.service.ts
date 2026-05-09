@@ -1,4 +1,4 @@
-import {useApi} from "../composables/useApi";
+import {useApi} from "../composables/shared/useApi";
 import type {Product} from "../types/product";
 
 export interface ProductListResponse {

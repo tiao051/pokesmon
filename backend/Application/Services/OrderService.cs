@@ -10,7 +10,7 @@ public enum OrderListView { Active, Completed, All }
 
 public record OrderListQuery(string UserEmail, bool? IsPreorder, OrderListView View);
 
-public enum OrderResultKind { Ok, NotFound, BadRequest, Forbidden }
+public enum OrderResultKind { Ok, NotFound, BadRequest }
 
 public class OrderOperationResult<T>
 {
@@ -26,12 +26,10 @@ public class OrderOperationResult<T>
 public class OrderService
 {
     private readonly MongoDbContext _context;
-    private readonly ILogger<OrderService> _logger;
 
-    public OrderService(MongoDbContext context, ILogger<OrderService> logger)
+    public OrderService(MongoDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     public async Task<List<OrderResponse>> ListAsync(OrderListQuery q, CancellationToken ct = default)

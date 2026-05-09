@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { formatPrice } from '../types/product'
+import { formatPrice } from '../../utils/format'
 
 const props = defineProps({
   mode: { type: String, default: 'standard' }, // 'standard' | 'preorder'
@@ -37,7 +37,7 @@ const handleClick = () => {
 </script>
 
 <template>
-  <aside class="order-summary" :class="{ 'is-preorder': isPreorder }">
+  <aside class="order-summary">
     <div class="summary-stamp" aria-hidden="true"></div>
 
     <div class="summary-header">

@@ -59,7 +59,7 @@ public static class DbSeeder
         if (await context.Orders.Find(o => o.UserEmail == email).AnyAsync()) return;
 
         var products = await context.Products
-            .Find(p => p.ProductLineName == "Pokemon")
+            .Find(p => p.ProductLineName == Constants.PokemonProductLine)
             .Limit(8)
             .ToListAsync();
         if (products.Count == 0) return;

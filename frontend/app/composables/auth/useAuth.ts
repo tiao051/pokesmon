@@ -1,6 +1,6 @@
 import {computed} from "vue";
-import {authService} from "../services/authService";
-import {usePersistedState} from "./usePersistedState";
+import {authService} from "../../services/auth.service";
+import {usePersistedState} from "../shared/usePersistedState";
 
 export interface Location {
 	id: string;

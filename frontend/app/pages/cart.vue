@@ -23,18 +23,15 @@ const initialView = (() => {
   return 'standard'
 })()
 
-const view = ref(initialView) // 'standard' | 'preorder'
+const view = ref(initialView)
 const isPreorderView = computed(() => view.value === 'preorder')
 
 const activeItems = computed(() =>
   isPreorderView.value ? preorderItems.value : standardItems.value,
 )
-const activeCount = computed(() =>
-  isPreorderView.value ? preorderCount.value : standardCount.value,
-)
 
 const headerSubtitle = computed(() => {
-  const c = activeCount.value
+  const c = isPreorderView.value ? preorderCount.value : standardCount.value
   if (c === 0) return ''
   const noun = c === 1 ? 'artifact' : 'artifacts'
   return isPreorderView.value

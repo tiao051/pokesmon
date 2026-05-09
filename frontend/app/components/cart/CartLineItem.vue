@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, toRef } from 'vue'
-import type { CartItem } from '../composables/useCart'
-import { useProductImage } from '../composables/useProductImage'
-import { formatPrice } from '../utils/format'
+import type { CartItem } from '../../composables/cart/useCart'
+import { useProductImage } from '../../composables/products/useProductImage'
+import { formatPrice } from '../../utils/format'
 
 const props = defineProps<{ item: CartItem }>()
 

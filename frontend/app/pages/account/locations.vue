@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import type { Location } from '~/composables/useAuth'
+import type { Location } from '~/composables/auth/useAuth'
 
 definePageMeta({
   middleware: 'auth-required',

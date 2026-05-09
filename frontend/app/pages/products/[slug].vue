@@ -1,7 +1,7 @@
 <script setup>
 	import {ref, computed} from "vue";
-	import {formatPrice} from "../../types/product";
-	import {productService} from "../../services/productService";
+	import {formatPrice} from "../../utils/format";
+	import {productService} from "../../services/products.service";
 
 	const route = useRoute();
 	const router = useRouter();

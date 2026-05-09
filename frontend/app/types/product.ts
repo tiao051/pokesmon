@@ -15,6 +15,3 @@ export interface Product {
 	isPreorder: boolean;
 	tags: string[];
 }
-
-// Re-export for backwards compatibility with existing imports.
-export { formatPrice } from "../utils/format";

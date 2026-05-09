@@ -1,6 +1,6 @@
 <script setup>
 	import {ref, onMounted, onUnmounted, computed} from "vue";
-	import {productService} from "../services/productService";
+	import {productService} from "../services/products.service";
 
 	const RAIL_LIMIT = 8;
 	const HOME_CACHE_TTL_MS = 120_000;

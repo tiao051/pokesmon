@@ -1,4 +1,4 @@
-import {useApi, setAuthToken} from "../composables/useApi";
+import {useApi, setAuthToken} from "../composables/shared/useApi";
 
 export interface User {
 	id: string;

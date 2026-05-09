@@ -1,7 +1,7 @@
 <script setup>
 	import {ref, computed, watch} from "vue";
 	import {useRoute} from "vue-router";
-	import {productService} from "../../services/productService";
+	import {productService} from "../../services/products.service";
 
 	const route = useRoute();
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {STATUS_LABELS, type Order} from "../services/orderService";
-import {formatPrice} from "../utils/format";
+import {STATUS_LABELS, type Order} from "../../services/orders.service";
+import {formatPrice} from "../../utils/format";
 
 const props = defineProps<{order: Order}>();
 

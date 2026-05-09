@@ -5,6 +5,12 @@ export default defineNuxtConfig({
 	devtools: {enabled: true},
 	modules: ["@nuxt/image"],
 	css: ["~/assets/css/global.css"],
+	components: [
+		{ path: "~/components", pathPrefix: false },
+	],
+	imports: {
+		dirs: ["composables/**"],
+	},
 	runtimeConfig: {
 		public: {
 			apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:5044/api",

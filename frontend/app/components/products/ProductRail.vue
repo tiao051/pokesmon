@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, computed, watch, onMounted, onBeforeUnmount} from "vue";
-import type {Product} from "../types/product";
+import type {Product} from "../../types/product";
 
 const props = defineProps<{
 	title: string;

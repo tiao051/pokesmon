@@ -1,11 +1,11 @@
 <script setup lang="ts">
 	import { ref, computed, watch } from 'vue'
 	import { useRouter } from 'vue-router'
-	import { productService } from '../services/productService'
-	import { useSearchHistory } from '../composables/useSearchHistory'
-	import { useCart } from '../composables/useCart'
-	import { useAuth } from '../composables/useAuth'
-	import type { Product } from '../types/product'
+	import { productService } from '../../services/products.service'
+	import { useSearchHistory } from '../../composables/search/useSearchHistory'
+	import { useCart } from '../../composables/cart/useCart'
+	import { useAuth } from '../../composables/auth/useAuth'
+	import type { Product } from '../../types/product'
 
 	const router = useRouter()
 	const route = useRoute()

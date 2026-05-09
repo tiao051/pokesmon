@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, toRef} from "vue";
-import {usePagination} from "../composables/usePagination";
+import {usePagination} from "../../composables/shared/usePagination";
 
 const props = defineProps<{
 	currentPage: number;

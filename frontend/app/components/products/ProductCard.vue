@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {toRef} from "vue";
-import type {Product} from "../types/product";
-import {useProductImage} from "../composables/useProductImage";
-import {formatPrice} from "../utils/format";
+import type {Product} from "../../types/product";
+import {useProductImage} from "../../composables/products/useProductImage";
+import {formatPrice} from "../../utils/format";
 
 const props = defineProps<{product: Product}>();
 
