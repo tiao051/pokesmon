@@ -95,8 +95,8 @@ const handleSignOut = () => {
   <section class="profile-page">
     <header class="profile-page-header">
       <p class="eyebrow">— Pokédex Trainer Card —</p>
-      <h1 class="page-title">Trainer Profile</h1>
-      <p class="page-subtitle">Stamped, registered, and sealed beneath the museum's glass.</p>
+      <h1 class="page-title">Your Profile</h1>
+      <p class="page-subtitle">Your trainer info, all in one place.</p>
     </header>
 
     <div class="profile-grid">
@@ -155,6 +155,10 @@ const handleSignOut = () => {
             <span class="nav-glyph" aria-hidden="true"></span>
             <span class="nav-label">My Orders</span>
           </NuxtLink>
+          <NuxtLink to="/account/favorites" class="nav-item" active-class="active">
+            <span class="nav-glyph" aria-hidden="true"></span>
+            <span class="nav-label">Favorites</span>
+          </NuxtLink>
           <NuxtLink to="/account/change-password" class="nav-item" active-class="active">
             <span class="nav-glyph" aria-hidden="true"></span>
             <span class="nav-label">Security</span>
@@ -169,7 +173,7 @@ const handleSignOut = () => {
       <!-- RIGHT: details -->
       <article class="details-card">
         <header class="details-header">
-          <h2 class="details-title">Trainer Details</h2>
+          <h2 class="details-title">Your Details</h2>
           <div class="details-actions">
             <button
               v-if="!editing"
@@ -275,7 +279,7 @@ const handleSignOut = () => {
 
 <style scoped>
 .profile-page {
-  max-width: var(--container-max);
+  max-width: clamp(var(--container-max), 90vw, 1500px);
   margin: 0 auto;
   padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(3rem, 8vw, 5rem);
 }

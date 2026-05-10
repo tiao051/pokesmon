@@ -128,7 +128,7 @@
 			<section class="legal-section">
 				<h2>5. Returns & Refunds</h2>
 				<p>
-					We want you to be delighted with your acquisition. Our
+					We want you to be happy with your order. Our
 					return policy allows returns within 30 days of delivery for
 					most items, provided they are in original, unused condition
 					with all packaging and documentation intact.

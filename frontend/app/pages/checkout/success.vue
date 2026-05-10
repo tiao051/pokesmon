@@ -2,9 +2,9 @@
 import { computed } from 'vue'
 
 const route = useRoute()
-const acquisitionRef = computed(() => route.query.ref || 'PG-XXXXXX')
+const orderRef = computed(() => route.query.ref || 'PG-XXXXXX')
 
-useHead({ title: 'Welcome to the Collection — PokéGogh' })
+useHead({ title: 'Order Placed — PokéGogh' })
 </script>
 
 <template>
@@ -17,20 +17,20 @@ useHead({ title: 'Welcome to the Collection — PokéGogh' })
         </svg>
       </div>
 
-      <span class="success-eyebrow">Acquisition Confirmed</span>
-      <h1 class="success-title">Welcome to the Collection</h1>
+      <span class="success-eyebrow">Order Confirmed</span>
+      <h1 class="success-title">Thank You for Your Order!</h1>
       <p class="success-message">
-        Your acquisition is being prepared by our curators. A confirmation has been dispatched to your patron address. Thank you for supporting the PokéGogh Museum.
+        Your order is being prepared. We've sent a confirmation to your email. Thank you for shopping with PokéGogh.
       </p>
 
       <div class="acquisition-ref">
-        <span class="ref-label">Acquisition Reference</span>
-        <span class="ref-value">{{ acquisitionRef }}</span>
+        <span class="ref-label">Order ID</span>
+        <span class="ref-value">{{ orderRef }}</span>
       </div>
 
       <div class="success-actions">
-        <NuxtLink to="/" class="btn-secondary-museum">Return to Museum</NuxtLink>
-        <NuxtLink to="/products" class="btn-primary-museum">Continue Browsing</NuxtLink>
+        <NuxtLink to="/" class="btn-secondary-museum">Back to Home</NuxtLink>
+        <NuxtLink to="/products" class="btn-primary-museum">Keep Shopping</NuxtLink>
       </div>
     </article>
   </main>

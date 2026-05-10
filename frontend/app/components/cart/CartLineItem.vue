@@ -75,15 +75,22 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
       <span class="line-total-value">{{ lineTotal }}</span>
     </div>
 
-    <button class="cart-line-remove" aria-label="Remove from cart" @click="askRemove">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
-    </button>
+    <div class="cart-line-actions">
+      <FavoriteToggle
+        :product-id="item.product.id"
+        :product-title="item.product.title"
+        variant="inline"
+      />
+      <button class="cart-line-remove" aria-label="Remove from cart" @click="askRemove">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>
 
     <ConfirmDialog
       v-model:open="showConfirm"
-      title="Withdraw this acquisition?"
-      :message="`Remove “${item.product.title}” from your pending acquisitions?`"
-      confirm-label="Yes, Withdraw"
+      title="Remove this item?"
+      :message="`Remove “${item.product.title}” from your cart?`"
+      confirm-label="Yes, Remove"
       cancel-label="Keep It"
       @confirm="confirmRemove"
     />
@@ -108,13 +115,20 @@ const lineTotal = computed(() => formatPrice(props.item.product.price * props.it
   .cart-line {
     grid-template-columns: 80px 1fr auto;
     grid-template-areas:
-      "thumb info remove"
+      "thumb info actions"
       "thumb qty total";
     gap: 0.75rem 1rem;
   }
   .cart-thumb { grid-area: thumb; }
   .cart-line-info { grid-area: info; }
   .cart-line-qty { grid-area: qty; align-self: end; }
+  .cart-line-actions { grid-area: actions; }
+}
+
+.cart-line-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .cart-thumb {

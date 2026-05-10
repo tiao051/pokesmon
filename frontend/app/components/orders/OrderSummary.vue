@@ -19,16 +19,16 @@ const emit = defineEmits(['cta-click'])
 const isPreorder = computed(() => props.mode === 'preorder')
 const total = computed(() => props.subtotal + props.shipping + props.tax)
 const headlineLabel = computed(() =>
-  isPreorder.value ? 'Deposit Today' : 'Acquisition Total',
+  isPreorder.value ? 'Pay Today (Deposit)' : 'Total',
 )
 const headlineValue = computed(() =>
   isPreorder.value ? props.deposit : total.value,
 )
 const titleText = computed(() =>
-  isPreorder.value ? 'Reservation Summary' : 'Acquisition Summary',
+  isPreorder.value ? 'Pre-order Summary' : 'Order Summary',
 )
 const eyebrowText = computed(() =>
-  isPreorder.value ? "— Trainer's Reservation —" : "— Trainer's Receipt —",
+  isPreorder.value ? '— Pre-order Receipt —' : '— Order Receipt —',
 )
 
 const handleClick = () => {
@@ -47,23 +47,23 @@ const handleClick = () => {
 
     <div class="summary-rows">
       <div class="summary-row">
-        <span class="row-label">{{ isPreorder ? 'Reservation Subtotal' : 'Subtotal' }}</span>
+        <span class="row-label">Subtotal</span>
         <span class="row-value">{{ formatPrice(subtotal) }}</span>
       </div>
 
       <template v-if="isPreorder">
         <div class="summary-row">
-          <span class="row-label">Due at Delivery</span>
+          <span class="row-label">Pay on Delivery</span>
           <span class="row-value">{{ formatPrice(remaining) }}</span>
         </div>
       </template>
       <template v-else>
         <div class="summary-row">
-          <span class="row-label">Pokémart Postage</span>
-          <span class="row-value">{{ shipping > 0 ? formatPrice(shipping) : 'Complimentary' }}</span>
+          <span class="row-label">Shipping</span>
+          <span class="row-value">{{ shipping > 0 ? formatPrice(shipping) : 'Free' }}</span>
         </div>
         <div v-if="tax > 0" class="summary-row">
-          <span class="row-label">Estimated Tax</span>
+          <span class="row-label">Tax</span>
           <span class="row-value">{{ formatPrice(tax) }}</span>
         </div>
       </template>
@@ -75,7 +75,7 @@ const handleClick = () => {
     </div>
 
     <p v-if="isPreorder" class="preorder-note">
-      Deposit varies by card rarity. The remaining balance is collected upon delivery.
+      Deposit % is based on card rarity. You pay the rest when the item ships.
     </p>
 
     <slot name="extra" />

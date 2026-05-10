@@ -56,10 +56,10 @@ const handleResend = () => {
       <img src="/images/charizard.png" alt="" class="fp-stamp" aria-hidden="true" />
 
       <div class="fp-header">
-        <p class="fp-eyebrow">— Pokémart Postage —</p>
+        <p class="fp-eyebrow">— Reset Your Password —</p>
         <h1 class="fp-title">Forgot Password</h1>
         <p class="fp-subtitle">
-          Even seasoned trainers misplace a key. Send your patron address and we'll dispatch a fresh keystone.
+          No worries — enter your email and we'll send a reset link.
         </p>
       </div>
 
@@ -68,16 +68,16 @@ const handleResend = () => {
           <div class="success-mark" aria-hidden="true">
             <img src="/images/gau_map.png" alt="" class="success-image" />
           </div>
-          <h2>It's on its way</h2>
+          <h2>Check your inbox</h2>
           <p>
-            If a trainer file matches <span class="sent-email">{{ sentTo }}</span>,
-            a reset link is making its rounds through Pokémart Postage. Check your inbox shortly.
+            If an account matches <span class="sent-email">{{ sentTo }}</span>,
+            we've sent a reset link. Check your inbox shortly.
           </p>
           <div class="success-actions">
             <button type="button" class="link-button" @click="handleResend">
-              Send to a different patron
+              Try a different email
             </button>
-            <NuxtLink to="/login" class="back-cta">Return to the Museum</NuxtLink>
+            <NuxtLink to="/login" class="back-cta">Back to Sign In</NuxtLink>
           </div>
         </div>
       </Transition>
@@ -91,7 +91,7 @@ const handleResend = () => {
         </Transition>
 
         <div class="fp-field">
-          <label for="email">Patron's Email</label>
+          <label for="email">Email</label>
           <input
             id="email"
             v-model="email"

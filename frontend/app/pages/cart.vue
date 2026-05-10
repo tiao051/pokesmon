@@ -33,19 +33,19 @@ const activeItems = computed(() =>
 const headerSubtitle = computed(() => {
   const c = isPreorderView.value ? preorderCount.value : standardCount.value
   if (c === 0) return ''
-  const noun = c === 1 ? 'artifact' : 'artifacts'
+  const noun = c === 1 ? 'item' : 'items'
   return isPreorderView.value
-    ? `${c} ${noun} reserved for future arrival`
-    : `${c} ${noun} awaiting confirmation`
+    ? `${c} ${noun} reserved for arrival`
+    : `${c} ${noun} ready to check out`
 })
 
 const emptyMessage = computed(() =>
   isPreorderView.value
-    ? 'No pre-orders reserved yet. Browse upcoming arrivals to secure your place.'
-    : "No artifacts have been reserved yet. Begin your collection from the museum's catalog.",
+    ? 'No pre-orders yet. Browse upcoming items to reserve your spot.'
+    : 'Your cart is empty. Start shopping to add items.',
 )
 const emptyCtaLabel = computed(() =>
-  isPreorderView.value ? 'Browse Pre-orders' : 'Browse The Collection',
+  isPreorderView.value ? 'Browse Pre-orders' : 'Browse Items',
 )
 const emptyCtaTo = computed(() =>
   isPreorderView.value ? '/products?isPreorder=true' : '/products',
@@ -60,15 +60,39 @@ const proceedToCheckout = () => {
   }
 }
 
-useHead({ title: 'Pending Acquisitions — PokéGogh' })
+useHead({ title: 'Your Cart — PokéGogh' })
 </script>
 
 <template>
   <main class="cart-page">
-    <header class="page-header">
-      <span class="eyebrow gold-italic">Reserve a Place in the Collection</span>
-      <h1 class="page-title">Your Pending Acquisitions</h1>
-      <p v-if="headerSubtitle" class="page-subtitle">{{ headerSubtitle }}</p>
+    <header v-if="activeItems.length > 0" class="cart-hero">
+      <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cherish-ball.png"
+        alt=""
+        aria-hidden="true"
+        class="cart-hero-stamp"
+        loading="eager"
+        decoding="async"
+      />
+      <div class="cart-hero-text">
+        <p class="cart-hero-eyebrow">— Items Ready to Check Out —</p>
+        <h1 class="cart-hero-title">Your Cart</h1>
+        <p v-if="headerSubtitle" class="cart-hero-subtitle">
+          {{ headerSubtitle }} — Delibird is watching over your bag.
+        </p>
+      </div>
+      <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/225.png"
+        alt="Delibird, our shop's courier"
+        class="cart-hero-mascot"
+        loading="lazy"
+        decoding="async"
+      />
+    </header>
+
+    <header v-else class="page-header">
+      <span class="eyebrow gold-italic">Items Ready to Check Out</span>
+      <h1 class="page-title">Your Cart</h1>
     </header>
 
     <div class="cart-tabs" role="tablist" aria-label="Cart type">
@@ -111,23 +135,37 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
     </div>
 
     <div v-if="isPreorderView && activeItems.length > 0" class="preorder-banner">
-      <span class="preorder-banner-stamp" aria-hidden="true"></span>
+      <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/timer-ball.png"
+        alt=""
+        aria-hidden="true"
+        class="preorder-banner-stamp"
+        loading="lazy"
+        decoding="async"
+      />
       <div class="preorder-banner-text">
-        <p class="preorder-banner-title">Pre-order Reservations</p>
+        <p class="preorder-banner-title">Pre-order Items</p>
         <p class="preorder-banner-desc">
-          These items haven't arrived at the gallery yet. Pay a deposit today
-          (% varies by card rarity) and the remaining balance when they ship.
+          These items haven't arrived yet. Pay a deposit today
+          (% based on card rarity) and the rest when they ship.
         </p>
       </div>
     </div>
 
-    <EmptyState
-      v-if="activeItems.length === 0"
-      :title="isPreorderView ? 'No reservations yet' : 'Your gallery awaits'"
-      :message="emptyMessage"
-      :cta-label="emptyCtaLabel"
-      :cta-to="emptyCtaTo"
-    />
+    <div v-if="activeItems.length === 0" class="cart-empty">
+      <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/446.png"
+        alt="A hungry Munchlax"
+        class="cart-empty-mascot"
+        loading="lazy"
+        decoding="async"
+      />
+      <h2 class="cart-empty-title">
+        {{ isPreorderView ? 'Munchlax says: nothing reserved yet' : 'Munchlax is waiting to be fed' }}
+      </h2>
+      <p class="cart-empty-msg">{{ emptyMessage }}</p>
+      <NuxtLink :to="emptyCtaTo" class="cart-empty-cta">{{ emptyCtaLabel }}</NuxtLink>
+    </div>
 
     <div v-else class="cart-grid">
       <div class="cart-lines">
@@ -143,12 +181,12 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
           v-if="!isPreorderView"
           :subtotal="standardSubtotal"
           :shipping="0"
-          cta-label="Proceed to Acquisition"
+          cta-label="Go to Checkout"
           @cta-click="proceedToCheckout"
         >
           <template #extra>
             <p v-if="!isLoggedIn" class="auth-hint">
-              You will be asked to sign in before completing your acquisition.
+              You'll be asked to sign in before checkout.
             </p>
           </template>
         </OrderSummary>
@@ -164,7 +202,7 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
         >
           <template #extra>
             <p v-if="!isLoggedIn" class="auth-hint">
-              You will be asked to sign in before reserving your pre-order.
+              You'll be asked to sign in before pre-ordering.
             </p>
           </template>
         </OrderSummary>
@@ -175,7 +213,7 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
 
 <style scoped>
 .cart-page {
-  max-width: var(--container-max);
+  max-width: clamp(var(--container-max), 90vw, 1500px);
   margin: 0 auto;
   padding: 0 2rem clamp(4rem, 7vw, 6rem);
 }
@@ -183,6 +221,131 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
 .page-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+/* Cart hero — Cherish Ball stamp + Delibird mascot */
+.cart-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.75rem 1.75rem 1.75rem 1.75rem;
+  margin-bottom: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(0, 49, 83, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(0, 49, 83, 0.07) 0%, rgba(0, 49, 83, 0.01) 100%);
+  border: 1.5px solid rgba(0, 49, 83, 0.18);
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 160px;
+}
+
+.cart-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-prussian-blue) 30%, var(--color-prussian-blue) 70%, transparent);
+  box-shadow: 0 0 12px rgba(0, 49, 83, 0.4);
+}
+
+.cart-hero-stamp {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 3px 4px rgba(0, 49, 83, 0.3));
+  transform: rotate(-8deg);
+}
+
+.cart-hero-text {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-hero-eyebrow {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: #C2821B;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  margin: 0 0 0.3rem;
+}
+
+.cart-hero-title {
+  font-family: var(--font-serif);
+  color: var(--color-prussian-blue);
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.cart-hero-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--color-cypress-green);
+  margin-top: 0.6rem;
+  border-radius: 2px;
+}
+
+.cart-hero-subtitle {
+  font-family: var(--font-sans);
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0.85rem 0 0;
+  max-width: 520px;
+}
+
+/* Delibird mascot — courier carrying your acquisitions */
+.cart-hero-mascot {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  transform-origin: center bottom;
+  filter: drop-shadow(2px 4px 8px rgba(0, 49, 83, 0.25));
+  animation: delibird-hop 3.5s ease-in-out infinite;
+}
+
+@keyframes delibird-hop {
+  0%, 100% { transform: translateY(0) rotate(4deg); }
+  50%      { transform: translateY(-6px) rotate(1deg); }
+}
+
+@media (max-width: 768px) {
+  .cart-hero-mascot { width: 105px; height: 105px; }
+  .cart-hero-stamp  { width: 60px;  height: 60px; }
+}
+
+@media (max-width: 600px) {
+  .cart-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+  .cart-hero-title::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cart-hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cart-hero-mascot { width: 95px; height: 95px; }
 }
 
 .eyebrow.gold-italic {
@@ -211,11 +374,6 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
   background-color: var(--color-cypress-green);
   margin: 0.85rem auto 0;
   border-radius: 2px;
-}
-
-.page-subtitle {
-  font-family: var(--font-sans);
-  color: #555;
 }
 
 .cart-tabs {
@@ -319,14 +477,12 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
 
 .preorder-banner-stamp {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, #fff 0 22%, #1a1a1a 22% 32%, transparent 32%),
-    linear-gradient(180deg, #b22222 0 47%, #1a1a1a 47% 53%, #fff 53% 100%);
-  border: 1.5px solid var(--color-prussian-blue);
-  box-shadow: 2px 2px 0 rgba(0, 49, 83, 0.2);
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 3px 4px rgba(178, 34, 34, 0.3));
   transform: rotate(-8deg);
 }
 
@@ -394,5 +550,67 @@ useHead({ title: 'Pending Acquisitions — PokéGogh' })
   margin: -0.5rem 0 1.25rem;
   position: relative;
   z-index: 1;
+}
+
+.cart-empty {
+  text-align: center;
+  padding: clamp(2rem, 5vw, 3rem) 1.5rem clamp(2.5rem, 6vw, 4rem);
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px dashed rgba(0, 49, 83, 0.18);
+  border-radius: 16px;
+  margin-top: 1.5rem;
+}
+
+.cart-empty-mascot {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  margin: 0 auto 0.5rem;
+  display: block;
+  filter: drop-shadow(2px 4px 8px rgba(0, 49, 83, 0.18));
+  animation: munchlax-bob 3s ease-in-out infinite;
+}
+
+@keyframes munchlax-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.cart-empty-title {
+  font-family: var(--font-serif);
+  color: var(--color-prussian-blue);
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+}
+
+.cart-empty-msg {
+  font-family: var(--font-sans);
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 auto 1.5rem;
+  max-width: 380px;
+}
+
+.cart-empty-cta {
+  display: inline-block;
+  padding: 0.85rem 1.75rem;
+  background: linear-gradient(135deg, #E8A931 0%, #DDA74F 50%, #C2821B 100%);
+  color: #2C1E04;
+  border: 1px solid #B07212;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: inset 1px 2px 3px rgba(255,255,255,0.4), 2px 4px 8px rgba(0, 0, 0, 0.18);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cart-empty-cta:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: inset 1px 2px 4px rgba(255,255,255,0.55), 0 0 22px rgba(245, 176, 65, 0.45), 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 </style>

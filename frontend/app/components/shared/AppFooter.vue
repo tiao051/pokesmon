@@ -5,14 +5,13 @@
 				<div class="footer-brand">
 					<h2 class="footer-logo">PokéGogh</h2>
 					<p class="footer-desc">
-						A post-impressionist journey through the Pokémon
-						universe, capturing the electric essence of the
-						classics.
+						A post-impressionist take on the Pokémon universe,
+						bringing classic cards to life.
 					</p>
 				</div>
 
 				<div class="footer-links">
-					<h4 class="footer-heading">Collection</h4>
+					<h4 class="footer-heading">Shop</h4>
 					<nav>
 						<a href="#">Trading Cards</a>
 						<a href="#">Elite Trainer Boxes</a>
@@ -22,20 +21,19 @@
 				</div>
 
 				<div class="footer-links">
-					<h4 class="footer-heading">Museum</h4>
+					<h4 class="footer-heading">About</h4>
 					<nav>
-						<a href="#">About the Artist</a>
-						<a href="#">Exhibitions</a>
+						<a href="#">Our Story</a>
+						<a href="#">Events</a>
 						<a href="#">FAQ & Support</a>
 						<a href="#">Contact Us</a>
 					</nav>
 				</div>
 
 				<div class="footer-newsletter">
-					<h4 class="footer-heading">Stay Inspired</h4>
+					<h4 class="footer-heading">Stay in Touch</h4>
 					<p>
-						Join our newsletter for the latest TCG acquisitions and
-						exhibition updates.
+						Sign up for news on new arrivals and special drops.
 					</p>
 					<form class="subscribe-form" @submit.prevent>
 						<input
@@ -64,8 +62,7 @@
 
 			<div class="footer-bottom">
 				<p>
-					© 2026 PokéGogh Museum Collection | Inspired by Vincent van
-					Gogh
+					© 2026 PokéGogh | Inspired by Vincent van Gogh
 				</p>
 				<div class="footer-legal">
 					<NuxtLink to="/privacy">Privacy Policy</NuxtLink>

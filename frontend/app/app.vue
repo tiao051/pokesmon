@@ -1,3 +1,19 @@
+<script setup>
+import { watch } from 'vue'
+
+const { isLoggedIn } = useAuth()
+const favorites = useFavorites()
+
+watch(
+  isLoggedIn,
+  (loggedIn) => {
+    if (loggedIn) favorites.ensureLoaded().catch(() => {})
+    else favorites.reset()
+  },
+  { immediate: true },
+)
+</script>
+
 <template>
   <NuxtLayout>
     <NuxtPage />
@@ -652,7 +668,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Shop Section */
 .shop-section {
-  max-width: var(--container-max);
+  max-width: clamp(var(--container-max), 90vw, 1500px);
   margin: 0 auto;
   padding: 6rem 2rem;
 }

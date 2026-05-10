@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<OrderService>();
+        services.AddScoped<FavoritesService>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         return services;

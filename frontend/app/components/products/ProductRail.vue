@@ -62,10 +62,32 @@ const prev = () => {
 const next = () => {
 	if (currentPage.value < maxPage.value) currentPage.value++;
 };
+
+const POKEAPI_ITEM_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items";
+const ballByTheme: Record<string, string> = {
+	preorder: "timer-ball",
+	display: "quick-ball",
+	master: "luxury-ball",
+	vault: "heavy-ball",
+	curator: "friend-ball",
+};
+
+const ballSrc = computed(() =>
+	props.theme ? `${POKEAPI_ITEM_BASE}/${ballByTheme[props.theme]}.png` : null,
+);
 </script>
 
 <template>
 	<section class="rail" :class="theme ? `rail--${theme}` : ''">
+		<img
+			v-if="ballSrc"
+			:src="ballSrc"
+			alt=""
+			aria-hidden="true"
+			class="rail-ball-stamp"
+			loading="lazy"
+			decoding="async"
+		/>
 		<header class="rail-header">
 			<div class="rail-heading-block">
 				<span v-if="eyebrow" class="rail-eyebrow">{{ eyebrow }}</span>
@@ -131,7 +153,7 @@ const next = () => {
 			</div>
 
 			<p v-else-if="error" class="rail-state-msg rail-error">
-				This wing is closed for the moment. Please return shortly.
+				Couldn't load this section. Please try again.
 			</p>
 
 			<div
@@ -149,7 +171,7 @@ const next = () => {
 			</div>
 
 			<p v-else class="rail-state-msg">
-				No pieces on display in this wing yet.
+				No items here yet.
 			</p>
 		</div>
 	</section>
@@ -367,6 +389,36 @@ const next = () => {
 	margin-bottom: 1.5rem;
 	padding-bottom: 0.75rem;
 	border-bottom: 1px solid rgba(0, 49, 83, 0.12);
+}
+
+/* Pokeball seal stamp — sits on top accent line as section badge */
+.rail-ball-stamp {
+	position: absolute;
+	top: -16px;
+	left: 1.25rem;
+	width: 36px;
+	height: 36px;
+	object-fit: contain;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+	filter: drop-shadow(1.5px 2px 3px rgba(0, 49, 83, 0.3));
+	transform: rotate(-12deg);
+	z-index: 3;
+	pointer-events: none;
+	transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rail:hover .rail-ball-stamp {
+	transform: rotate(0) scale(1.1);
+}
+
+@media (max-width: 768px) {
+	.rail-ball-stamp {
+		width: 30px;
+		height: 30px;
+		top: -14px;
+		left: 0.75rem;
+	}
 }
 
 .rail-title {

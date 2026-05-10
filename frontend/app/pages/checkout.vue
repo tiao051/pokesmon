@@ -1,21 +1,45 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted } from 'vue'
 
 const router = useRouter()
-const { items, subtotal, count, clear } = useCart()
+const route = useRoute()
+const {
+  standardItems,
+  standardSubtotal,
+  standardCount,
+  preorderItems,
+  preorderSubtotal,
+  preorderDeposit,
+  preorderRemaining,
+  preorderCount,
+  clear,
+} = useCart()
 const { isLoggedIn, email: authEmail } = useAuth()
 
+const isPreorder = computed(() => route.query.type === 'preorder')
+
+const activeItems = computed(() =>
+  isPreorder.value ? preorderItems.value : standardItems.value,
+)
+const activeSubtotal = computed(() =>
+  isPreorder.value ? preorderSubtotal.value : standardSubtotal.value,
+)
+const activeCount = computed(() =>
+  isPreorder.value ? preorderCount.value : standardCount.value,
+)
+
 onMounted(() => {
-  if (count.value === 0) {
+  if (activeCount.value === 0) {
     router.replace('/cart')
     return
   }
   if (!isLoggedIn.value) {
-    router.replace('/login?redirect=/checkout')
+    const target = `/checkout${isPreorder.value ? '?type=preorder' : ''}`
+    router.replace(`/login?redirect=${encodeURIComponent(target)}`)
   }
 })
 
-useHead({ title: 'Complete Your Acquisition — PokéGogh' })
+useHead({ title: 'Checkout — PokéGogh' })
 
 const form = reactive({
   fullName: '',
@@ -35,31 +59,66 @@ const submitting = ref(false)
 const placeOrder = () => {
   if (submitting.value) return
   submitting.value = true
-  const acquisitionRef = 'PG-' + Date.now().toString().slice(-8)
+  const orderRef = 'PG-' + Date.now().toString().slice(-8)
   setTimeout(() => {
     clear()
-    router.push(`/checkout/success?ref=${acquisitionRef}`)
+    router.push(`/checkout/success?ref=${orderRef}`)
   }, 600)
 }
 </script>
 
 <template>
-  <main v-if="items.length > 0" class="checkout-page">
-    <header class="page-header">
-      <span class="eyebrow gold-italic">Final Brushstroke</span>
-      <h1 class="page-title">Complete Your Acquisition</h1>
+  <main v-if="activeItems.length > 0" class="checkout-page">
+    <header class="checkout-hero" :class="{ 'is-preorder': isPreorder }">
+      <img
+        :src="isPreorder
+          ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/timer-ball.png'
+          : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cherish-ball.png'"
+        alt=""
+        aria-hidden="true"
+        class="checkout-hero-stamp"
+        loading="eager"
+        decoding="async"
+      />
+      <div class="checkout-hero-text">
+        <p class="checkout-hero-eyebrow">
+          — {{ isPreorder ? 'Final Step · Pre-order' : 'Final Step' }} —
+        </p>
+        <h1 class="checkout-hero-title">
+          {{ isPreorder ? 'Reserve Your Pre-order' : 'Checkout' }}
+        </h1>
+        <p class="checkout-hero-subtitle">
+          {{ isPreorder
+            ? 'Audino is ready to take your deposit and watch over your reservation until it ships.'
+            : 'Audino is ready to wrap up your order — last details and you\'re done.' }}
+        </p>
+      </div>
+      <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/531.png"
+        alt="Audino, the shop's caring helper"
+        class="checkout-hero-mascot"
+        loading="lazy"
+        decoding="async"
+      />
     </header>
 
     <form class="checkout-grid" @submit.prevent="placeOrder">
       <div class="checkout-form-side">
-        <div class="form-pokeball-stamp" aria-hidden="true"></div>
+        <img
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/premier-ball.png"
+          alt=""
+          aria-hidden="true"
+          class="form-pokeball-stamp"
+          loading="lazy"
+          decoding="async"
+        />
 
-        <span class="form-eyebrow">— Patron's Manuscript —</span>
+        <span class="form-eyebrow">— Shipping Details —</span>
 
         <section class="form-section">
           <header class="form-section-header">
             <span class="section-badge">I</span>
-            <h2 class="section-heading">Trainer Card</h2>
+            <h2 class="section-heading">Your Info</h2>
           </header>
           <div class="form-grid">
             <div class="form-group full">
@@ -80,7 +139,7 @@ const placeOrder = () => {
         <section class="form-section">
           <header class="form-section-header">
             <span class="section-badge">II</span>
-            <h2 class="section-heading">Pokémart Postage</h2>
+            <h2 class="section-heading">Shipping Address</h2>
           </header>
           <div class="form-grid">
             <div class="form-group full">
@@ -105,9 +164,9 @@ const placeOrder = () => {
         <section class="form-section">
           <header class="form-section-header">
             <span class="section-badge">III</span>
-            <h2 class="section-heading">Trainer's Coin Pouch</h2>
+            <h2 class="section-heading">Payment</h2>
           </header>
-          <p class="section-note">A demonstration form. No real payment is processed.</p>
+          <p class="section-note">This is a demo form. No real payment is processed.</p>
           <div class="form-grid">
             <div class="form-group full">
               <label for="cardNumber">Card Number</label>
@@ -129,21 +188,24 @@ const placeOrder = () => {
           class="checkout-submit-mobile"
           :disabled="submitting"
         >
-          {{ submitting ? 'Confirming…' : 'Confirm Acquisition' }}
+          {{ submitting ? 'Confirming…' : (isPreorder ? 'Reserve with Deposit' : 'Place Order') }}
         </button>
       </div>
 
       <div class="checkout-summary-side">
         <OrderSummary
-          :subtotal="subtotal"
+          :mode="isPreorder ? 'preorder' : 'standard'"
+          :subtotal="activeSubtotal"
           :shipping="0"
-          :cta-label="submitting ? 'Confirming…' : 'Confirm Acquisition'"
+          :deposit="preorderDeposit"
+          :remaining="preorderRemaining"
+          :cta-label="submitting ? 'Confirming…' : (isPreorder ? 'Reserve with Deposit' : 'Place Order')"
           :cta-disabled="submitting"
           @cta-click="placeOrder"
         >
           <template #extra>
             <ul class="summary-items">
-              <li v-for="item in items" :key="item.product.id" class="summary-item">
+              <li v-for="item in activeItems" :key="item.product.id" class="summary-item">
                 <span class="summary-item-qty">{{ item.quantity }}×</span>
                 <span class="summary-item-title">{{ item.product.title }}</span>
               </li>
@@ -157,41 +219,150 @@ const placeOrder = () => {
 
 <style scoped>
 .checkout-page {
-  max-width: var(--container-max);
+  max-width: clamp(var(--container-max), 90vw, 1500px);
   margin: 0 auto;
   padding: clamp(3rem, 6vw, 5rem) 2rem clamp(4rem, 7vw, 6rem);
 }
 
-.page-header {
-  text-align: center;
-  margin-bottom: 3rem;
+/* Checkout hero — mirror favorites/cart pattern */
+.checkout-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.75rem 1.75rem 1.75rem 1.75rem;
+  margin-bottom: 2rem;
+  background:
+    radial-gradient(circle at top right, rgba(0, 49, 83, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(0, 49, 83, 0.07) 0%, rgba(0, 49, 83, 0.01) 100%);
+  border: 1.5px solid rgba(0, 49, 83, 0.18);
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 160px;
 }
 
-.eyebrow.gold-italic {
+.checkout-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-prussian-blue) 30%, var(--color-prussian-blue) 70%, transparent);
+  box-shadow: 0 0 12px rgba(0, 49, 83, 0.4);
+}
+
+.checkout-hero.is-preorder {
+  background:
+    radial-gradient(circle at top right, rgba(255, 105, 180, 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(178, 34, 34, 0.1) 0%, rgba(178, 34, 34, 0.02) 100%);
+  border-color: rgba(178, 34, 34, 0.25);
+}
+
+.checkout-hero.is-preorder::before {
+  background: linear-gradient(90deg, transparent, #b22222 30%, #b22222 70%, transparent);
+  box-shadow: 0 0 12px rgba(178, 34, 34, 0.4);
+}
+
+.checkout-hero-stamp {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 3px 4px rgba(0, 49, 83, 0.3));
+  transform: rotate(-8deg);
+}
+
+.checkout-hero-text {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
+}
+
+.checkout-hero-eyebrow {
   font-family: var(--font-serif);
   font-style: italic;
   color: #C2821B;
-  font-size: 1.05rem;
-  display: block;
-  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  margin: 0 0 0.3rem;
 }
 
-.page-title {
+.checkout-hero.is-preorder .checkout-hero-eyebrow {
+  color: #b22222;
+}
+
+.checkout-hero-title {
   font-family: var(--font-serif);
   color: var(--color-prussian-blue);
-  font-size: clamp(2.25rem, 5vw, 3rem);
-  position: relative;
-  display: inline-block;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
 }
-.page-title::after {
-  content: '\2766';
+
+.checkout-hero-title::after {
+  content: "";
   display: block;
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  color: rgba(194, 130, 27, 0.7);
-  margin: 0.85rem auto 0;
-  letter-spacing: 0;
-  line-height: 1;
+  width: 60px;
+  height: 3px;
+  background-color: var(--color-cypress-green);
+  margin-top: 0.6rem;
+  border-radius: 2px;
+}
+
+.checkout-hero-subtitle {
+  font-family: var(--font-sans);
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0.85rem 0 0;
+  max-width: 520px;
+}
+
+/* Audino mascot — caring helper */
+.checkout-hero-mascot {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  transform-origin: center bottom;
+  filter: drop-shadow(2px 4px 8px rgba(255, 105, 180, 0.25));
+  animation: audino-sway 4s ease-in-out infinite;
+}
+
+@keyframes audino-sway {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-5px) rotate(3deg); }
+}
+
+@media (max-width: 768px) {
+  .checkout-hero-mascot { width: 105px; height: 105px; }
+  .checkout-hero-stamp  { width: 60px;  height: 60px; }
+}
+
+@media (max-width: 600px) {
+  .checkout-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+  .checkout-hero-title::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .checkout-hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .checkout-hero-mascot { width: 95px; height: 95px; }
 }
 
 .checkout-grid {
@@ -246,18 +417,17 @@ const placeOrder = () => {
 
 .form-pokeball-stamp {
   position: absolute;
-  top: 1.1rem;
+  top: 1rem;
   right: 1.25rem;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, #FBF9F2 0 22%, #1A1A1A 22% 32%, transparent 32%),
-    linear-gradient(180deg, #B22222 0 47%, #1A1A1A 47% 53%, #FBF9F2 53% 100%);
-  border: 1.5px solid var(--color-prussian-blue);
-  box-shadow: 2px 2px 0 rgba(0, 49, 83, 0.25);
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(1.5px 2px 3px rgba(0, 49, 83, 0.25));
   transform: rotate(-12deg);
   z-index: 2;
+  pointer-events: none;
 }
 
 .form-eyebrow {

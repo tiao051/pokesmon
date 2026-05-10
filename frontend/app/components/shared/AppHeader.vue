@@ -23,6 +23,7 @@
 	}
 	const { count } = useCart()
 	const { isLoggedIn, email, avatar, signOut } = useAuth()
+	const { count: favoritesCount } = useFavorites()
 
 	const DEFAULT_AVATAR = '/images/red_pokeball.jpg'
 	const headerAvatar = computed(() => avatar.value || DEFAULT_AVATAR)
@@ -225,6 +226,28 @@
 
 			<!-- Right Actions -->
 			<div class="header-actions">
+				<NuxtLink
+					v-if="isLoggedIn"
+					to="/account/favorites"
+					class="action-link favorites-action"
+					aria-label="My favorites"
+				>
+					<span class="favorites-icon-wrapper">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+						</svg>
+						<span v-if="favoritesCount > 0" class="favorites-badge">{{ favoritesCount }}</span>
+					</span>
+					<span class="action-text">FAVORITES</span>
+				</NuxtLink>
+
 				<NuxtLink to="/cart" class="action-link cart-action">
 					<span class="cart-icon-wrapper">
 						<svg
@@ -284,9 +307,33 @@
 							@click="dismissUserMenu"
 							>My Profile</NuxtLink
 						>
+						<NuxtLink
+							to="/account/orders"
+							class="user-dropdown-item"
+							role="menuitem"
+							@click="dismissUserMenu"
+							>My Orders</NuxtLink
+						>
+						<NuxtLink
+							to="/account/favorites"
+							class="user-dropdown-item dropdown-item-with-badge"
+							role="menuitem"
+							@click="dismissUserMenu"
+						>
+							<span>Favorites</span>
+							<span v-if="favoritesCount > 0" class="dropdown-count-badge">{{ favoritesCount }}</span>
+						</NuxtLink>
+						<NuxtLink
+							to="/account/locations"
+							class="user-dropdown-item"
+							role="menuitem"
+							@click="dismissUserMenu"
+							>My Locations</NuxtLink
+						>
+						<div class="user-dropdown-divider" aria-hidden="true"></div>
 						<button
 							type="button"
-							class="user-dropdown-item"
+							class="user-dropdown-item user-dropdown-item-danger"
 							@click="handleSignOut"
 						>
 							Sign Out
@@ -351,7 +398,7 @@
 				</button>
 			</div>
 			<NuxtLink to="/products" class="nav-link" @click="closeMenu"
-				>Browse The Collection</NuxtLink
+				>Browse Items</NuxtLink
 			>
 			<NuxtLink
 				v-if="!isLoggedIn"
@@ -364,9 +411,18 @@
 				<NuxtLink to="/account" class="nav-link" @click="closeMenu"
 					>My Profile</NuxtLink
 				>
-				<button class="nav-link nav-link-button" @click="handleSignOut">
-					Sign Out
-				</button>
+				<NuxtLink to="/account/orders" class="nav-link" @click="closeMenu"
+					>My Orders</NuxtLink
+				>
+				<NuxtLink to="/account/favorites" class="nav-link" @click="closeMenu">
+					Favorites
+					<span v-if="favoritesCount > 0" class="cart-badge cart-badge-mobile">{{
+						favoritesCount
+					}}</span>
+				</NuxtLink>
+				<NuxtLink to="/account/locations" class="nav-link" @click="closeMenu"
+					>My Locations</NuxtLink
+				>
 			</template>
 			<NuxtLink to="/cart" class="nav-link" @click="closeMenu">
 				My Cart
@@ -425,6 +481,36 @@
 		font-family: var(--font-sans);
 		line-height: 1;
 		box-shadow: 0 2px 4px rgba(0, 49, 83, 0.25);
+	}
+
+	.favorites-icon-wrapper {
+		position: relative;
+		display: inline-flex;
+	}
+
+	.favorites-action:hover .favorites-icon-wrapper svg {
+		color: #b22222;
+	}
+
+	.favorites-badge {
+		position: absolute;
+		top: -8px;
+		right: -10px;
+		background-color: #b22222;
+		color: #fff;
+		border: 2px solid var(--color-linen);
+		border-radius: 50%;
+		min-width: 22px;
+		height: 22px;
+		font-size: 0.72rem;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 5px;
+		font-family: var(--font-sans);
+		line-height: 1;
+		box-shadow: 0 2px 4px rgba(178, 34, 34, 0.3);
 	}
 
 	.nav-link-button {
@@ -528,6 +614,43 @@
 	.user-dropdown-item:hover {
 		background-color: rgba(0, 49, 83, 0.06);
 		color: var(--color-cypress-green);
+	}
+
+	.dropdown-item-with-badge {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.dropdown-count-badge {
+		min-width: 20px;
+		height: 20px;
+		padding: 0 0.4rem;
+		border-radius: 999px;
+		background: rgba(178, 34, 34, 0.12);
+		color: #b22222;
+		font-size: 0.7rem;
+		font-weight: 700;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
+	}
+
+	.user-dropdown-divider {
+		height: 1px;
+		background: rgba(0, 49, 83, 0.1);
+		margin: 0.4rem 0.4rem;
+	}
+
+	.user-dropdown-item-danger {
+		color: #b22222;
+	}
+
+	.user-dropdown-item-danger:hover {
+		background-color: rgba(178, 34, 34, 0.08);
+		color: #b22222;
 	}
 
 	.nav-link-button {

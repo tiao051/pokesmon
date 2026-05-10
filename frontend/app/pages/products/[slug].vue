@@ -26,7 +26,7 @@
 	if (!product.value && !detailLoading.value) {
 		throw createError({
 			statusCode: 404,
-			statusMessage: "This artifact is not in the collection",
+			statusMessage: "This item is not available",
 			fatal: true,
 		});
 	}
@@ -40,13 +40,13 @@
 		const result = add(product.value, quantity.value);
 		if (result.reason === "sold-out") {
 			toast.error(
-				`"${product.value.title}" is no longer in the gallery.`,
+				`"${product.value.title}" is sold out.`,
 			);
 			return false;
 		}
 		if (result.reason === "cap-reached") {
 			toast.error(
-				`The full reserve of "${product.value.title}" is already in your cart.`,
+				`You already have all available "${product.value.title}" in your cart.`,
 			);
 			return false;
 		}
@@ -111,7 +111,7 @@
 	<!-- Error -->
 	<main v-else-if="detailError" class="detail-page">
 		<EmptyState
-			title="Artifact not found"
+			title="Item not found"
 			message="This piece may have been removed from the collection."
 			cta-label="Back to The Collection"
 			cta-to="/products"
@@ -218,8 +218,8 @@
 							></span>
 							{{
 								product.stock > 0 ?
-									`${product.stock} remaining in the gallery`
-								:	"Unavailable"
+									`${product.stock} in stock`
+								:	"Sold out"
 							}}
 						</span>
 					</div>
@@ -242,7 +242,7 @@
 							:class="{'is-sold-out': product.stock === 0}"
 							@click="acquire"
 						>
-							Add to Collection
+							Add to Cart
 						</button>
 						<button
 							type="button"
@@ -250,7 +250,7 @@
 							:class="{'is-sold-out': product.stock === 0}"
 							@click="acquireNow"
 						>
-							Take it Home
+							Buy Now
 						</button>
 					</div>
 				</div>
@@ -258,7 +258,7 @@
 		</article>
 
 		<section v-if="related.length" class="related-section">
-			<h2 class="related-title">Companions in the Collection</h2>
+			<h2 class="related-title">You Might Also Like</h2>
 			<div class="product-grid">
 				<ProductCard v-for="r in related" :key="r.id" :product="r" />
 			</div>
@@ -268,7 +268,7 @@
 
 <style scoped>
 	.detail-page {
-		max-width: var(--container-max);
+		max-width: clamp(var(--container-max), 90vw, 1500px);
 		margin: 0 auto;
 		padding: clamp(2rem, 4vw, 3rem) 2rem clamp(4rem, 7vw, 6rem);
 	}

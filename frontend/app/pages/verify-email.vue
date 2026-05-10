@@ -60,11 +60,11 @@ const handleSubmit = async () => {
 
 		<div class="vp-card">
 			<div class="vp-header">
-				<p class="vp-eyebrow">— Trainer Verification —</p>
+				<p class="vp-eyebrow">— Verify Your Email —</p>
 				<h1 class="vp-title">Verify Your Email</h1>
 				<p class="vp-subtitle">
-					We've dispatched a 6-digit PIN to your inbox. Enter it below
-					to complete your registration and step into the gallery.
+					We've sent a 6-digit code to your email. Enter it below
+					to finish signing up.
 				</p>
 			</div>
 

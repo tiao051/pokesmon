@@ -40,6 +40,20 @@ public static class IndexInitializer
                 new CreateIndexOptions { Name = "ix_orders_user_created" }),
             cancellationToken: ct);
 
+        await ctx.Favorites.Indexes.CreateManyAsync(new[]
+        {
+            new CreateIndexModel<Favorite>(
+                Builders<Favorite>.IndexKeys
+                    .Ascending(f => f.UserEmail)
+                    .Ascending(f => f.ProductId),
+                new CreateIndexOptions { Unique = true, Name = "ix_favorites_user_product_unique" }),
+            new CreateIndexModel<Favorite>(
+                Builders<Favorite>.IndexKeys
+                    .Ascending(f => f.UserEmail)
+                    .Descending(f => f.CreatedAt),
+                new CreateIndexOptions { Name = "ix_favorites_user_created" }),
+        }, cancellationToken: ct);
+
         var ttl = TimeSpan.FromMinutes(Constants.OtpExpiryMinutes + 5);
         foreach (var collection in new[] { ctx.RegistrationPins, ctx.ResetPasswordPins })
         {

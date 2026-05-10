@@ -67,11 +67,10 @@
 				loading="eager"
 				decoding="async"
 			/>
-			<span class="eyebrow gold-italic">PokéGogh Museum Catalog</span>
-			<h1 class="page-title">The Collection</h1>
+			<span class="eyebrow gold-italic">PokéGogh Catalog</span>
+			<h1 class="page-title">All Items</h1>
 			<p class="page-subtitle">
-				Browse the museum's complete inventory of curated
-				post-impressionist Pokémon artifacts.
+				Browse our full collection of post-impressionist Pokémon items.
 			</p>
 			<div class="header-trainer-belt" aria-hidden="true">
 				<NuxtImg
@@ -117,7 +116,7 @@
 
 			<!-- Error fallback -->
 			<p v-else-if="catsError" class="inline-error">
-				Unable to load exhibition wings. Showing all artifacts.
+				Couldn't load filters. Showing all items.
 			</p>
 
 			<!-- Loaded selects + count -->
@@ -159,7 +158,7 @@
 					</div>
 				</div>
 				<div class="filter-right">
-					<span class="count-eyebrow">Artifacts</span>
+					<span class="count-eyebrow">Items</span>
 					<span class="count-value">{{ filteredCount }}</span>
 				</div>
 			</template>
@@ -186,8 +185,8 @@
 		</div>
 		<EmptyState
 			v-else
-			title="The gallery is currently quiet"
-			message="No artifacts match this filter. Try another wing of the museum."
+			title="No items found"
+			message="No items match this filter. Try changing your filters."
 		/>
 
 		<AppPagination
@@ -202,7 +201,7 @@
 <style scoped>
 	.collection-page {
 		width: 100%;
-		max-width: var(--container-max);
+		max-width: clamp(var(--container-max), 90vw, 1500px);
 		margin: 0 auto;
 		padding: clamp(3rem, 6vw, 5rem) 2rem clamp(4rem, 7vw, 6rem);
 	}

@@ -147,10 +147,10 @@ const handleSetDefault = async (loc: Location) => {
     </NuxtLink>
 
     <header class="loc-header">
-      <p class="loc-eyebrow">— Pokémart Postage Roster —</p>
+      <p class="loc-eyebrow">— Shipping Addresses —</p>
       <h1 class="loc-title">Saved Locations</h1>
       <p class="loc-subtitle">
-        Manage where your acquisitions arrive. Star one as default and we'll preselect it at checkout.
+        Manage where your orders ship to. Star one as default and we'll use it at checkout.
       </p>
     </header>
 

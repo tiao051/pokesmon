@@ -87,6 +87,19 @@ public class ProductService
             related.Select(p => MapToResponse(p, includeBase64: false)).ToList());
     }
 
+    public async Task<List<ProductResponse>> GetByProductIdsAsync(
+        IEnumerable<int> productIds, CancellationToken ct = default)
+    {
+        var ids = productIds.Distinct().ToList();
+        if (ids.Count == 0) return new List<ProductResponse>();
+
+        var products = await _context.Products
+            .Find(Builders<Product>.Filter.In(p => p.ProductId, ids))
+            .ToListAsync(ct);
+
+        return products.Select(p => MapToResponse(p, includeBase64: false)).ToList();
+    }
+
     public async Task<CategoriesResponse> GetCategoriesAsync(CancellationToken ct = default)
     {
         if (_cache.TryGetValue(CategoriesCacheKey, out CategoriesResponse? cached) && cached is not null)

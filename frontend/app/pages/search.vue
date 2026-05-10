@@ -141,7 +141,7 @@
 			<main class="search-main">
 				<div class="results-meta">
 					<p v-if="searchLoading" class="results-count">
-						Searching the gallery...
+						Searching...
 					</p>
 					<p v-else class="results-count">
 						Showing {{ filteredProducts.length }} of
@@ -163,8 +163,7 @@
 
 				<!-- Error -->
 				<p v-else-if="searchError" class="inline-error">
-					The curators are having trouble with the catalog. Please try
-					again.
+					Couldn't load search results. Please try again.
 				</p>
 
 				<div

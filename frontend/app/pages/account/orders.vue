@@ -63,12 +63,21 @@ const emptyMessage = computed(() => {
 
 <template>
 	<section class="orders-page">
-		<header class="orders-header">
-			<p class="eyebrow">— Trainer Order History —</p>
-			<h1 class="page-title">My Orders</h1>
-			<p class="page-subtitle">
-				Track your acquisitions through the museum's logistics line.
-			</p>
+		<header class="orders-hero">
+			<div class="orders-hero-text">
+				<p class="orders-hero-eyebrow">— Your Order History —</p>
+				<h1 class="orders-hero-title">My Orders</h1>
+				<p class="orders-hero-subtitle">
+					Pelipper is on the case — track your orders from our shop to your door.
+				</p>
+			</div>
+			<img
+				src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/279.png"
+				alt="Pelipper, our shop's courier"
+				class="orders-hero-mascot"
+				loading="lazy"
+				decoding="async"
+			/>
 		</header>
 
 		<div class="controls-bar">
@@ -140,9 +149,16 @@ const emptyMessage = computed(() => {
 			</div>
 
 			<div v-else class="orders-empty" :class="{ 'is-refetching': pending }">
+				<img
+					src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/79.png"
+					alt="A drowsy Slowpoke"
+					class="orders-empty-mascot"
+					loading="lazy"
+					decoding="async"
+				/>
 				<p class="empty-title">{{ emptyMessage }}</p>
 				<p class="empty-subtitle">
-					When you place an order, it will appear here.
+					Slowpoke is waiting — your orders will show up here.
 				</p>
 			</div>
 		</div>
@@ -151,14 +167,100 @@ const emptyMessage = computed(() => {
 
 <style scoped>
 .orders-page {
-	max-width: 980px;
+	max-width: clamp(var(--container-max), 90vw, 1500px);
 	margin: 0 auto;
 	padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(3rem, 8vw, 5rem);
 }
 
-.orders-header {
-	text-align: center;
-	margin-bottom: clamp(2rem, 5vw, 3rem);
+.orders-hero {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	padding: 1.75rem 1.75rem 1.75rem 1.75rem;
+	margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+	background: linear-gradient(
+		180deg,
+		rgba(15, 94, 60, 0.1) 0%,
+		rgba(15, 94, 60, 0.02) 100%
+	);
+	border: 1.5px solid rgba(15, 94, 60, 0.22);
+	border-radius: 18px;
+	overflow: hidden;
+	min-height: 160px;
+}
+
+.orders-hero::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 1.5rem;
+	right: 1.5rem;
+	height: 3px;
+	background: linear-gradient(90deg, transparent, var(--color-cypress-green) 30%, var(--color-cypress-green) 70%, transparent);
+	box-shadow: 0 0 12px rgba(15, 94, 60, 0.4);
+}
+
+.orders-hero-text {
+	flex: 1;
+	min-width: 0;
+}
+
+.orders-hero-eyebrow {
+	font-family: var(--font-serif);
+	font-style: italic;
+	color: var(--color-cypress-green);
+	font-size: 0.9rem;
+	letter-spacing: 1px;
+	margin: 0 0 0.25rem;
+}
+
+.orders-hero-title {
+	font-family: var(--font-serif);
+	color: var(--color-prussian-blue);
+	font-size: clamp(1.75rem, 4vw, 2.4rem);
+	margin: 0 0 0.4rem;
+	line-height: 1.15;
+	letter-spacing: -0.5px;
+}
+
+.orders-hero-subtitle {
+	font-family: var(--font-sans);
+	color: #555;
+	font-size: 0.9rem;
+	line-height: 1.5;
+	margin: 0;
+	max-width: 520px;
+}
+
+.orders-hero-mascot {
+	flex-shrink: 0;
+	width: 130px;
+	height: 130px;
+	object-fit: contain;
+	filter: drop-shadow(2px 4px 8px rgba(15, 94, 60, 0.25));
+	transform: translateY(4px) rotate(6deg);
+	animation: pelipper-fly 4s ease-in-out infinite;
+}
+
+@keyframes pelipper-fly {
+	0%, 100% { transform: translateY(4px) rotate(6deg); }
+	50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+@media (max-width: 600px) {
+	.orders-hero {
+		flex-direction: column;
+		text-align: center;
+		padding: 1.5rem 1.25rem 1rem;
+	}
+	.orders-hero-mascot {
+		width: 100px;
+		height: 100px;
+	}
+	.orders-hero-subtitle {
+		margin: 0 auto;
+	}
 }
 
 .controls-bar {
@@ -291,6 +393,21 @@ const emptyMessage = computed(() => {
 
 .orders-empty.is-refetching {
 	opacity: 0.5;
+}
+
+.orders-empty-mascot {
+	width: 160px;
+	height: 160px;
+	object-fit: contain;
+	margin: 0 auto 0.75rem;
+	display: block;
+	filter: drop-shadow(2px 4px 8px rgba(0, 49, 83, 0.18));
+	animation: slowpoke-doze 5s ease-in-out infinite;
+}
+
+@keyframes slowpoke-doze {
+	0%, 100% { transform: rotate(-2deg); }
+	50% { transform: rotate(2deg); }
 }
 
 .empty-title {

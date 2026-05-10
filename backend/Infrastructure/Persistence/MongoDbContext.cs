@@ -20,4 +20,5 @@ public class MongoDbContext
     public IMongoCollection<OtpRecord> RegistrationPins => _database.GetCollection<OtpRecord>("registration_pins");
     public IMongoCollection<OtpRecord> ResetPasswordPins => _database.GetCollection<OtpRecord>("reset_password_pins");
     public IMongoCollection<Order> Orders => _database.GetCollection<Order>("orders");
+    public IMongoCollection<Favorite> Favorites => _database.GetCollection<Favorite>("favorites");
 }

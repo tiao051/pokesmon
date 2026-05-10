@@ -3,6 +3,8 @@ const props = defineProps({
   error: Object
 })
 
+const errorImageSrc = '/images/error_404.jpg'
+
 const handleError = () => clearError({ redirect: '/' })
 </script>
 
@@ -10,16 +12,16 @@ const handleError = () => clearError({ redirect: '/' })
   <div class="error-page-wrapper">
     <div class="error-card">
       <div class="error-image-wrapper">
-        <img src="/images/error_404.jpg" alt="404 Not Found" class="error-image" />
+        <img :src="errorImageSrc" alt="404 Not Found" class="error-image" />
       </div>
-      
+
       <div class="error-content">
         <h1 class="error-code">{{ error?.statusCode || '404' }}</h1>
         <h2 class="error-title">A wild Error appeared!</h2>
         <p class="error-message">
           {{ error?.message || "We couldn't find the page you were looking for." }}
         </p>
-        
+
         <button @click="handleError" class="back-home-btn">
           Run Away! (Back to Home)
         </button>

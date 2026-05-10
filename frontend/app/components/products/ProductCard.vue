@@ -12,11 +12,11 @@ const toast = useToast();
 const handleAdd = () => {
 	const result = add(props.product, 1);
 	if (result.reason === "sold-out") {
-		toast.error(`"${props.product.title}" is no longer in the gallery.`);
+		toast.error(`"${props.product.title}" is sold out.`);
 		return;
 	}
 	if (result.reason === "cap-reached") {
-		toast.error(`The full reserve of "${props.product.title}" is already in your cart.`);
+		toast.error(`You already have all available "${props.product.title}" in your cart.`);
 		return;
 	}
 	const cartName = props.product.isPreorder ? "pre-order cart" : "cart";
@@ -56,7 +56,7 @@ const {src: imageSrc, isDataUrl} = useProductImage(productRef);
 
 				<button
 					class="add-to-cart-quick"
-					aria-label="Acquire"
+					aria-label="Add to cart"
 					@click.prevent.stop="handleAdd"
 				>
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -64,6 +64,12 @@ const {src: imageSrc, isDataUrl} = useProductImage(productRef);
 						<line x1="5" y1="12" x2="19" y2="12" />
 					</svg>
 				</button>
+
+				<FavoriteToggle
+					:product-id="product.id"
+					:product-title="product.title"
+					variant="corner"
+				/>
 
 				<span v-if="product.isPreorder" class="preorder-corner-badge">Pre-order</span>
 			</div>
