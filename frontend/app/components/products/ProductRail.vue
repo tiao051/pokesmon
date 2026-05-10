@@ -391,13 +391,13 @@ const ballSrc = computed(() =>
 	border-bottom: 1px solid rgba(0, 49, 83, 0.12);
 }
 
-/* Pokeball seal stamp — sits on top accent line as section badge */
+/* Pokeball seal stamp — sits inside rail just below top accent line */
 .rail-ball-stamp {
 	position: absolute;
-	top: -16px;
+	top: 0.6rem;
 	left: 1.25rem;
-	width: 36px;
-	height: 36px;
+	width: 34px;
+	height: 34px;
 	object-fit: contain;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
@@ -414,9 +414,9 @@ const ballSrc = computed(() =>
 
 @media (max-width: 768px) {
 	.rail-ball-stamp {
-		width: 30px;
-		height: 30px;
-		top: -14px;
+		width: 28px;
+		height: 28px;
+		top: 0.5rem;
 		left: 0.75rem;
 	}
 }

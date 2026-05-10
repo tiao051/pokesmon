@@ -31,6 +31,13 @@ const eyebrowText = computed(() =>
   isPreorder.value ? '— Pre-order Receipt —' : '— Order Receipt —',
 )
 
+const POKEAPI_ITEM_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items'
+const stampSrc = computed(() =>
+  isPreorder.value
+    ? `${POKEAPI_ITEM_BASE}/timer-ball.png`
+    : `${POKEAPI_ITEM_BASE}/heal-ball.png`,
+)
+
 const handleClick = () => {
   if (!props.ctaDisabled) emit('cta-click')
 }
@@ -38,7 +45,14 @@ const handleClick = () => {
 
 <template>
   <aside class="order-summary">
-    <div class="summary-stamp" aria-hidden="true"></div>
+    <img
+      :src="stampSrc"
+      alt=""
+      aria-hidden="true"
+      class="summary-stamp"
+      loading="lazy"
+      decoding="async"
+    />
 
     <div class="summary-header">
       <span class="summary-eyebrow">{{ eyebrowText }}</span>
@@ -124,21 +138,20 @@ const handleClick = () => {
   border-radius: inherit;
 }
 
-/* Pokeball stamp matching the patron's manuscript on the left */
+/* Pokeball seal stamp — pixel-art ball from PokeAPI */
 .summary-stamp {
   position: absolute;
-  top: 1rem;
-  right: 1.25rem;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, #FBF9F2 0 22%, #1A1A1A 22% 32%, transparent 32%),
-    linear-gradient(180deg, #B22222 0 47%, #1A1A1A 47% 53%, #FBF9F2 53% 100%);
-  border: 1.5px solid var(--color-prussian-blue);
-  box-shadow: 2px 2px 0 rgba(0, 49, 83, 0.25);
-  transform: rotate(-8deg);
+  top: 0.85rem;
+  right: 1.1rem;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(1.5px 2px 3px rgba(0, 49, 83, 0.3));
+  transform: rotate(-10deg);
   z-index: 2;
+  pointer-events: none;
 }
 
 .summary-header,
